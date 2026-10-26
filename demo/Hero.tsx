@@ -20,18 +20,18 @@ const PRESETS: { id: PresetId; label: string; hint: string }[] = [
 
 // Map colours tuned for the dark hero.
 const DARK: MapTheme = {
-  fill: '#1e293b',
+  fill: '#475569',
   stroke: '#0b1020',
-  hoverFill: '#475569',
+  hoverFill: '#64748b',
   selectedFill: '#818cf8',
   focusStroke: '#e0e7ff',
   labelColor: '#e2e8f0',
   labelHalo: '#0b1020',
-  foreignFill: '#141c2e',
-  regionBorder: '#64748b',
+  foreignFill: '#2a3446',
+  regionBorder: '#cbd5e1',
 };
 
-const HEAT = ['#172554', '#2563eb', '#67e8f9'];
+const HEAT = ['#3b4f86', '#3b82f6', '#a5f3fc'];
 const POP_DOMAIN: [number, number] = [0, 10_500_000];
 
 const PLAYGROUND_DATA = [
@@ -93,7 +93,7 @@ const data = [
   { id: 'Lazio', value: 5_879_082 },
   // …
 ];
-const colors = ['#172554', '#2563eb', '#67e8f9'];
+const colors = ['#3b4f86', '#3b82f6', '#a5f3fc'];
 
 export function Population() {
   return (
@@ -151,7 +151,7 @@ export function Drilldown() {
     <ItalyProvincesMap
       region={region}
       data={provincePopulation}
-      colorScale={{ colors: ['#172554', '#2563eb', '#67e8f9'] }}${common}
+      colorScale={{ colors: ['#3b4f86', '#3b82f6', '#a5f3fc'] }}${common}
     />
   ) : (
     <ItalyMap onRegionClick={(r) => setRegion(r.code)}${common} />
@@ -163,7 +163,7 @@ export function Drilldown() {
 export default function Hero() {
   const [preset, setPreset] = useState<PresetId>('playground');
   const [panel, setPanel] = useState<'controls' | 'code'>('controls');
-  const [fill, setFill] = useState('#1e293b');
+  const [fill, setFill] = useState('#475569');
   const [stroke, setStroke] = useState('#0b1020');
   const [selectedFill, setSelectedFill] = useState('#818cf8');
   const [labels, setLabels] = useState(false);
@@ -240,7 +240,7 @@ export default function Hero() {
       map = (
         <ItalyMap
           {...common}
-          theme={{ ...DARK, fill, stroke, selectedFill, hoverFill: '#334155' }}
+          theme={{ ...DARK, fill, stroke, selectedFill, hoverFill: '#64748b' }}
           data={PLAYGROUND_DATA}
           selected={single}
           zoomOnSelect={zoomOnSelect}
@@ -270,7 +270,7 @@ export default function Hero() {
       map = (
         <ItalyMap
           {...common}
-          theme={{ ...DARK, selectedFill: '#22d3ee', hoverFill: '#155e75' }}
+          theme={{ ...DARK, selectedFill: '#22d3ee', hoverFill: '#0e7490' }}
           selectionMode="multiple"
           selected={multi}
           showCorsica={false}
@@ -282,7 +282,7 @@ export default function Hero() {
       map = (
         <ItalyProvincesMap
           {...common}
-          theme={{ ...DARK, selectedFill: '#f472b6', hoverFill: '#831843', labelSize: 14 }}
+          theme={{ ...DARK, selectedFill: '#f472b6', hoverFill: '#be185d', labelSize: 14 }}
           selected={province}
           zoomOnSelect
           onSelectionChange={(codes, a) => { setProvince(codes); push(`onSelectionChange → ${a.name} (${a.code})`); }}
@@ -433,7 +433,6 @@ export default function Hero() {
         </aside>
 
         <div className="hero2-map">
-          <div className="hero2-glow" aria-hidden />
           <div className="hero2-map-inner" key={preset}>{map}</div>
           {overlay}
           <div className="hero2-status">
