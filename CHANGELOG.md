@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+- Fix: a selected area keeps `selectedFill` while hovered (the hover colour used to win).
+
 ## 1.0.1
 
 First public release.

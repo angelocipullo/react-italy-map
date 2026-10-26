@@ -8,7 +8,7 @@ export const CSS = `
 .rim-deco{fill:var(--rim-foreign);pointer-events:none}
 .rim-area.rim-foreign{fill:var(--a-fill,var(--rim-foreign))}
 .rim-area:not(.rim-disabled):hover,.rim-area.rim-hover{fill:var(--a-hover,var(--rim-hover))}
-.rim-area.rim-selected{fill:var(--rim-selected)}
+.rim-area.rim-selected,.rim-area.rim-selected:hover{fill:var(--rim-selected)}
 .rim-area.rim-disabled{fill:var(--a-fill,var(--rim-disabled))}
 .rim-area.rim-dim{opacity:var(--rim-dim)}
 .rim-clickable .rim-area:not(.rim-disabled){cursor:pointer}

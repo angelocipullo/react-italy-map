@@ -16,6 +16,7 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "paths": {
       "react-italy-map": ["./src/index.ts"],
       "react-italy-map/provinces": ["./src/provinces.ts"]

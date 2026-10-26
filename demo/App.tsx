@@ -1,6 +1,4 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react';
-import { ItalyMap, type ItalyMapHandle } from 'react-italy-map';
-import { ItalyProvincesMap } from 'react-italy-map/provinces';
+import { useState, type ReactNode } from 'react';
 import Choropleth from '../examples/Choropleth';
 import Filter from '../examples/Filter';
 import MultiSelect from '../examples/MultiSelect';
@@ -12,6 +10,7 @@ import multiSelectSource from '../examples/MultiSelect.tsx?raw';
 import drilldownSource from '../examples/Drilldown.tsx?raw';
 import provincesSource from '../examples/Provinces.tsx?raw';
 import './App.css';
+import Hero from './Hero';
 
 // ─── Shared ───────────────────────────────────────────────────────
 const CodeBlock = ({ code }: { code: string }) => {
@@ -25,35 +24,6 @@ const CodeBlock = ({ code }: { code: string }) => {
     </div>
   );
 };
-
-const Switch = ({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) => (
-  <div className="control-group">
-    <div className="switch-container">
-      <span className="label" style={{ marginBottom: 0 }}>{label}</span>
-      <label className="switch">
-        <input type="checkbox" checked={checked} onChange={e => onChange(e.target.checked)} aria-label={label} />
-        <span className="slider" />
-      </label>
-    </div>
-  </div>
-);
-
-const download = (svg: string, name: string) => {
-  const url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = name;
-  a.click();
-  URL.revokeObjectURL(url);
-};
-
-// ─── Hero configurator ────────────────────────────────────────────
-const HERO_DATA = [
-  { id: 'lombardia', color: '#10b981', child: <span style={{ fontSize: '20px' }}>🌲</span> },
-  { id: 'lazio', color: '#f59e0b', child: <span style={{ fontSize: '20px' }}>🏛️</span> },
-  { id: 'IT-82', color: '#ef4444', child: <span style={{ fontSize: '20px' }}>🍋</span> },
-  { id: 'sardinia', color: '#3b82f6', child: <span style={{ color: 'white', fontWeight: 'bold', background: '#2b2b2b', borderRadius: 5, padding: '2px 6px' }}>Ciao!</span> },
-];
 
 // ─── API Reference ────────────────────────────────────────────────
 type ApiTab = 'props' | 'theme' | 'data' | 'ref' | 'utils';
@@ -278,141 +248,15 @@ const FEATURES = [
 ];
 
 function App() {
-  const [level, setLevel] = useState<'regions' | 'provinces'>('regions');
-  const [fill, setFill] = useState('#247f44');
-  const [stroke, setStroke] = useState('#ffffff');
-  const [selectedFill, setSelectedFill] = useState('#3b82f6');
-  const [height, setHeight] = useState(600);
-  const [multiple, setMultiple] = useState(false);
-  const [showCorsica, setShowCorsica] = useState(true);
-  const [showLabels, setShowLabels] = useState(false);
-  const [zoomable, setZoomable] = useState(true);
-  const [zoomOnSelect, setZoomOnSelect] = useState(false);
-  const [selected, setSelected] = useState<string[]>([]);
-  const [showCode, setShowCode] = useState(false);
   const [activeExample, setActiveExample] = useState<ExampleId>('choropleth');
   const [showExCode, setShowExCode] = useState(false);
-  const mapRef = useRef<ItalyMapHandle>(null);
-
-  const theme = useMemo(() => ({ fill, stroke, selectedFill }), [fill, stroke, selectedFill]);
-  const Component = level === 'regions' ? 'ItalyMap' : 'ItalyProvincesMap';
-  const codeString = `import { useState } from 'react';
-import { ${level === 'regions' ? 'ItalyMap' : 'ItalyProvincesMap'} } from 'react-italy-map${level === 'provinces' ? '/provinces' : ''}';
-
-export default function App() {
-  const [selected, setSelected] = useState<string[]>(${JSON.stringify(selected)});
-
-  return (
-    <${Component}
-      height={${height}}
-      theme={{ fill: '${fill}', stroke: '${stroke}', selectedFill: '${selectedFill}' }}
-      selectionMode="${multiple ? 'multiple' : 'single'}"
-      selected={selected}
-      onSelectionChange={setSelected}${level === 'regions' ? `
-      data={[{ id: 'lombardia', color: '#10b981', child: <span>🌲</span> }, …]}
-      showCorsica={${showCorsica}}` : ''}
-      showLabels={${showLabels}}
-      zoomable={${zoomable}}
-      zoomOnSelect={${zoomOnSelect}}
-      renderTooltip={(area) => <div className="custom-tooltip">{area.name} ({area.code})</div>}
-    />
-  );
-}`;
-
-  const commonProps = {
-    ref: mapRef,
-    height,
-    theme,
-    selectionMode: multiple ? 'multiple' as const : 'single' as const,
-    selected,
-    onSelectionChange: setSelected,
-    showCorsica,
-    showLabels,
-    zoomable,
-    zoomOnSelect,
-    renderTooltip: (a: { name: string; code: string }) => <div className="custom-tooltip">{a.name} ({a.code})</div>,
-  };
-
   const active = EXAMPLES.find(e => e.id === activeExample)!;
 
   return (
     <div className="app">
-      <nav className="navbar">
-        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', padding: '0 20px' }}>
-          <a href="#" className="logo">React Italy Map</a>
-          <div className="nav-links">
-            <a href="#home" className="nav-link">Home</a>
-            <a href="#features" className="nav-link">Features</a>
-            <a href="#api" className="nav-link">API</a>
-            <a href="#examples" className="nav-link">Examples</a>
-          </div>
-        </div>
-      </nav>
+      <Hero />
 
       <main className="container">
-        <section id="home" className="hero">
-          <div className="configurator">
-            <div className="config-header">
-              <h2 className="config-title">Configurator</h2>
-              <div className="switch-container" style={{ gap: '10px' }}>
-                <span className="label" style={{ marginBottom: 0, color: showCode ? 'white' : '#94a3b8' }}>Code</span>
-                <label className="switch">
-                  <input type="checkbox" checked={showCode} onChange={e => setShowCode(e.target.checked)} aria-label="Mostra codice" />
-                  <span className="slider" />
-                </label>
-              </div>
-            </div>
-
-            {!showCode ? (
-              <>
-                <div className="control-group">
-                  <label className="label">Livello</label>
-                  <div className="ex-tabs" style={{ marginBottom: 0 }}>
-                    {(['regions', 'provinces'] as const).map(l => (
-                      <button key={l} className={`ex-tab${level === l ? ' ex-tab--active' : ''}`} onClick={() => { setLevel(l); setSelected([]); }}>
-                        {l === 'regions' ? 'Regioni' : 'Province'}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="control-group">
-                  <label className="label">Fill</label>
-                  <input type="color" className="input-color" value={fill} onChange={e => setFill(e.target.value)} />
-                </div>
-                <div className="control-group">
-                  <label className="label">Stroke</label>
-                  <input type="color" className="input-color" value={stroke} onChange={e => setStroke(e.target.value)} />
-                </div>
-                <div className="control-group">
-                  <label className="label">Selected Fill</label>
-                  <input type="color" className="input-color" value={selectedFill} onChange={e => setSelectedFill(e.target.value)} />
-                </div>
-                <div className="control-group">
-                  <label className="label">Height: {height}px</label>
-                  <input type="range" min="300" max="800" className="input-range" value={height} onChange={e => setHeight(Number(e.target.value))} />
-                </div>
-                <Switch label="Selezione multipla" checked={multiple} onChange={v => { setMultiple(v); setSelected([]); }} />
-                <Switch label="Show Labels" checked={showLabels} onChange={setShowLabels} />
-                <Switch label="Zoomable" checked={zoomable} onChange={setZoomable} />
-                <Switch label="Zoom on select" checked={zoomOnSelect} onChange={setZoomOnSelect} />
-                <Switch label="Show Corsica" checked={showCorsica} onChange={setShowCorsica} />
-                <div className="control-group" style={{ display: 'flex', gap: 8 }}>
-                  <button className="ex-reset-btn" onClick={() => mapRef.current?.zoomTo(['Calabria', 'Sicilia'])}>zoomTo Sud</button>
-                  <button className="ex-reset-btn" onClick={() => download(mapRef.current?.toSVGString() ?? '', 'mappa-italia.svg')}>Export SVG</button>
-                </div>
-              </>
-            ) : (
-              <CodeBlock code={codeString} />
-            )}
-          </div>
-
-          <div className="map-preview">
-            {level === 'regions'
-              ? <ItalyMap {...commonProps} data={HERO_DATA} />
-              : <ItalyProvincesMap {...commonProps} />}
-          </div>
-        </section>
-
         <section id="features" className="section">
           <h2 className="section-title">Why use this library?</h2>
           <div className="features-grid">
