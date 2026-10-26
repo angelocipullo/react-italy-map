@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.1
+
+- Fix: a mouse drag released outside the map no longer leaves the map panning (and jumping back) on the next hover.
+- Fix: double-click to zoom no longer selects and then deselects the area under the pointer.
+- Fix: `NaN` / `Infinity` values no longer crash colour scales; such areas stay uncoloured and are left out of the automatic domain.
+- Fix: a non-integer `steps` in `colorScale` / `Legend` is rounded down instead of producing missing colours.
+- Fix: `ItalyDrilldownMap` keeps keyboard focus when a region is opened or closed from the keyboard (back button / previous region), so Escape keeps working.
+- Fix: `toSVGString()` no longer exports the province fade-in, which left provinces invisible when rasterised.
+- Docs: new "Preparing your data" section in the README (accepted and rejected ids, aggregation, live data, ids in callbacks).
+- Docs: `llms.txt`, a guide for AI coding agents, shipped in the npm package and published with the demo.
+
 ## 1.2.0
 
 - `ItalyDrilldownMap`: clicking the map background (not another region) goes back to Italy (`closeOnBackgroundClick`, default `true`); a drag never counts as a click.

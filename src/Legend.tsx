@@ -15,10 +15,11 @@ export interface LegendProps {
 }
 
 /** Colour legend for a choropleth map, matching `colorScale`. */
-export function Legend({ colors, domain, steps, title, format = (v) => v.toLocaleString(), className, style }: LegendProps) {
+export function Legend({ colors, domain, steps: stepsProp, title, format = (v) => v.toLocaleString(), className, style }: LegendProps) {
     const [min, max] = domain;
+    const steps = Math.floor(stepsProp ?? 0);
     let background: string;
-    if (steps && steps > 1) {
+    if (steps > 1) {
         const color = createColorScale({ colors, domain, steps });
         const stops = Array.from({ length: steps }, (_, i) => {
             const c = color(min + ((i + 0.5) / steps) * (max - min));

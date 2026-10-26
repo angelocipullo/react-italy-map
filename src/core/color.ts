@@ -38,17 +38,20 @@ export const createColorScale = ({
     const span = max - min || 1;
     const last = colors.length - 1;
 
+    // NaN (e.g. a missing value) falls back to the lowest colour instead of crashing.
     const at = (t: number) => {
-        const pos = Math.min(1, Math.max(0, t)) * last;
+        const pos = (Number.isNaN(t) ? 0 : Math.min(1, Math.max(0, t))) * last;
         const i = Math.min(last - 1, Math.floor(pos));
         return interpolateColor(colors[i]!, colors[i + 1]!, pos - i);
     };
 
-    if (steps && steps > 1) {
-        const palette = Array.from({ length: steps }, (_, i) => at(i / (steps - 1)));
+    const n = Math.floor(steps ?? 0);
+    if (n > 1) {
+        const palette = Array.from({ length: n }, (_, i) => at(i / (n - 1)));
         return (value) => {
-            const t = Math.min(1, Math.max(0, (value - min) / span));
-            return palette[Math.min(steps - 1, Math.floor(t * steps))]!;
+            const raw = (value - min) / span;
+            const t = Number.isNaN(raw) ? 0 : Math.min(1, Math.max(0, raw));
+            return palette[Math.min(n - 1, Math.floor(t * n))]!;
         };
     }
     return (value) => at((value - min) / span);

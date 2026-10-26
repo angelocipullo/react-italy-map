@@ -1,0 +1,137 @@
+# react-italy-map
+
+> Interactive SVG map of Italy for React (>=17): 20 regions and 110 provinces (ISTAT 2025 boundaries), choropleths, selection, zoom, tooltips, keyboard support. No runtime dependencies, SSR-safe, TypeScript types included.
+
+This file is a guide for AI coding agents integrating the library. The full human docs are in README.md; every prop is also documented with JSDoc in the shipped `.d.ts` files. Only use the props and exports listed here — do not invent others.
+
+## Install and entry points
+
+```bash
+npm install react-italy-map
+```
+
+- `react-italy-map` → `ItalyMap` (regions), `Legend`, data and helpers.
+- `react-italy-map/provinces` → `ItalyProvincesMap`, `ItalyDrilldownMap` (separate entry so province geometry is only bundled when used).
+
+No CSS import is needed: styles are inlined. Components carry `"use client"` and render on the server.
+
+## Pick the component
+
+| Need | Component |
+|---|---|
+| One value / state per region | `ItalyMap` |
+| One value / state per province, whole country or some regions (`region="Lombardia"`) | `ItalyProvincesMap` |
+| Regions first, click one to open its provinces in place | `ItalyDrilldownMap` (`data` = regions, `provinceData` = provinces) |
+| Colour key for a choropleth | `Legend` with the same `colors` / `domain` / `steps` |
+
+Not supported: municipalities (comuni), custom GeoJSON / other boundaries (ASL, constituencies), lat/lon markers or points. `data[].child` places a React node at an area's centre — the only way to put content on the map.
+
+## Data contract
+
+`data` (and `provinceData`) is an array of entries, or an object keyed by id:
+
+```ts
+type AreaData<TMeta> = {
+  id: string;            // see "Ids" below
+  value?: number;        // must be a finite number; strings are ignored (no colour, no error)
+  color?: string;        // explicit fill, wins over colorScale
+  hoverColor?: string;
+  label?: string;        // label text when showLabels
+  child?: ReactNode;     // node at the area's centre
+  disabled?: boolean;    // not clickable / selectable / focusable
+  className?: string;
+  meta?: TMeta;          // your record, returned in callbacks as area.data.meta
+};
+// or: { Lombardia: { value: 10 }, Lazio: { value: 5 } }
+```
+
+The library never fetches, parses or aggregates. Always transform first:
+
+```ts
+const toNumber = (s: string) => Number(s.replace(/\./g, '').replace(',', '.')); // Italian "1.234,5"
+const data = rows.map((row) => ({ id: row.regione, value: toNumber(row.totale), meta: row }));
+```
+
+Aggregate one-row-per-item data yourself; `findProvince(x)?.regionCode` maps a province to its region:
+
+```ts
+import { findProvince } from 'react-italy-map';
+const totals: Record<string, number> = {};
+for (const t of tickets) {
+  const region = findProvince(t.provincia)?.regionCode;
+  if (region) totals[region] = (totals[region] ?? 0) + 1;
+}
+const data = Object.entries(totals).map(([id, value]) => ({ id, value }));
+```
+
+## Ids
+
+Matching is case-, accent- and punctuation-insensitive.
+
+- Regions: ISO `IT-25`, ISTAT `03` / `3`, Italian or English name (`Lombardia`, `Lombardy`), bilingual official name.
+- Provinces: sigla `MI` / `IT-MI`, ISTAT `015` / `15`, name (`Milano`, `Reggio nell'Emilia`), aliases (`Reggio Emilia`, `Monza e Brianza`, `Bozen`, `Forli-Cesena`…).
+- Neighbours (ItalyMap only, clickable like regions): `SM` San Marino, `VA` Vatican City, `FR-H` Corsica. Hide them with `showSanMarino` / `showVatican` / `showCorsica={false}`.
+
+NOT recognised — normalise before passing:
+
+- Prefixes: `Regione X`, `Provincia di X`, `Città metropolitana di X`.
+- English city names (`Milan`, `Rome`): use the Italian name or the sigla.
+- `P.A. Trento` / `P.A. Bolzano`, region codes `21` / `22` (health / civil-protection datasets): sum into `IT-32` on the region map, or use `TN` / `BZ` on the province map.
+- `SU` / `Sud Sardegna` / ISTAT `111`: abolished in 2025, no shape.
+
+Validate: `findRegion(id)` / `findProvince(id)` return `undefined` when nothing matches. `ItalyMap` and `ItalyProvincesMap` warn in development for unmatched ids; `ItalyDrilldownMap` drops them silently.
+
+## Colour
+
+```tsx
+const SCALE = { colors: ['#e0f2fe', '#0c4a6e'], domain: [0, 500] as [number, number], steps: 5 };
+<Legend {...SCALE} title="Ticket attivi" format={(v) => v.toLocaleString('it-IT')} />
+<ItalyMap data={data} colorScale={SCALE} formatValue={(v) => `${v} ticket`} />
+```
+
+- `colorScale`: `{ colors: hex[], domain?: [min, max], steps?: number }` (hex colours only) or `(value, area) => cssColor` for thresholds, categories, diverging scales.
+- Without `domain` the scale spans the current min–max: set a fixed `domain` for live / changing data and for several maps compared side by side.
+- Areas without an entry use `theme.fill`; choose it so "no data" is distinguishable from the lowest colour.
+- `Legend` only draws gradients / steps; for categories render your own legend.
+
+## Props (shared by all three maps)
+
+`data`, `colorScale`, `formatValue(value, area)`, `theme`, `className`, `style`, `width`, `height`, `title`,
+`selected`, `defaultSelected`, `selectionMode: 'none' | 'single' | 'multiple'`, `onSelectionChange(codes, area)`, `dimUnselected`,
+`tooltip` (boolean), `renderTooltip(area)` (or a function as `children`), `showLabels`, `labelText(area)`,
+`zoomable`, `maxZoom`, `showZoomControls`, `zoomOnSelect`, `include`, `exclude`, `showCorsica`, `showSanMarino`, `showVatican`.
+
+- `ItalyMap`: `onRegionClick(area, event)`, `onRegionHover(area | null, event | null)`.
+- `ItalyProvincesMap`: `region` (one or more region ids; fits the view), `showRegionBorders`, `onProvinceClick`, `onProvinceHover`.
+- `ItalyDrilldownMap`: no `selected*` / `selectionMode` / `onSelectionChange` / `dimUnselected` / `zoomOnSelect` / `include` / `exclude`. Instead: `region` / `defaultRegion` / `onRegionChange(area | null)`, `provinceData`, `provinceColorScale`, `dimOthers`, `showBackButton`, `backLabel`, `closeOnBackgroundClick`, `selectedProvinces` / `defaultSelectedProvinces` / `provinceSelectionMode` / `onProvinceSelectionChange(codes, province)`, and the four click / hover callbacks.
+
+`theme` keys: `fill`, `stroke`, `strokeWidth`, `hoverFill`, `selectedFill`, `disabledFill`, `foreignFill`, `dimOpacity`, `focusStroke`, `labelColor`, `labelHalo`, `labelSize`, `regionBorder`. Each is also a CSS variable on `.rim` (`--rim-fill`, …). Areas are `<path class="rim-area" data-code="IT-25">`.
+
+Selection turns on (`'single'`) as soon as `selected`, `defaultSelected` or `onSelectionChange` is passed.
+
+## Callbacks
+
+Callbacks receive a `MapArea`:
+
+```ts
+{ code: 'IT-25', name: 'Lombardia', kind: 'region' | 'province' | 'foreign', istat?: '03', regionCode?: 'IT-25', selected, disabled, data?: AreaData }
+```
+
+`code` and `onSelectionChange` codes are always canonical (`IT-25`, `MI`), never the id you passed. Use `area.data?.meta` to reach your record. A controlled `selected` accepts any id.
+
+## Imperative handle
+
+```tsx
+const ref = useRef<ItalyMapHandle>(null);
+<ItalyMap ref={ref} zoomable />;
+ref.current?.zoomTo(['Calabria', 'Sicilia'], { padding: 0.15, animate: true });
+ref.current?.zoomIn(); ref.current?.zoomOut(); ref.current?.resetZoom();
+ref.current?.getSvgElement();
+ref.current?.toSVGString(); // standalone SVG markup
+```
+
+## Data helpers
+
+`REGIONS`, `PROVINCES`, `PROVINCES_BY_REGION` (keyed by Italian region name), `findRegion(id)`, `findProvince(id)`, `getProvincesOfRegion(id)`, `getRegionsOfArea('nord-ovest' | 'nord-est' | 'centro' | 'sud' | 'isole')`, `createColorScale(options)`, `interpolateColor(a, b, t)`, `normalizeId(id)`.
+
+`RegionInfo`: `{ code, istat, name, nameEn, capital, area }`. `ProvinceInfo`: `{ code, istat, name, officialName?, region, regionCode, type, aliases? }`.

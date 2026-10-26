@@ -88,14 +88,14 @@ function applyScale<T>(
     if (typeof scale === 'function') {
         fn = (v, code, entry) => scale(v, areaOf(defOf(code), entry));
     } else {
-        const values = entries.map((e) => e.entry.value).filter((v): v is number => typeof v === 'number');
+        const values = entries.map((e) => e.entry.value).filter((v): v is number => Number.isFinite(v));
         const domain = scale.domain ?? (values.length ? [Math.min(...values), Math.max(...values)] as const : [0, 1] as const);
         const color = createColorScale({ ...scale, domain });
         fn = (v) => color(v);
     }
     return entries.map((e) =>
-        e.entry.color == null && typeof e.entry.value === 'number'
-            ? { ...e, entry: { ...e.entry, color: fn(e.entry.value, e.code, e.entry) } }
+        e.entry.color == null && Number.isFinite(e.entry.value)
+            ? { ...e, entry: { ...e.entry, color: fn(e.entry.value!, e.code, e.entry) } }
             : e);
 }
 
@@ -186,8 +186,12 @@ function ItalyDrilldownMapInner<TMeta>(
     ], [showCorsica, showSanMarino, showVatican]);
 
     // ── Opening / closing ──────────────────────────────────────────
-    const open = (code: string | null) => {
+    // Opening or closing removes the focused element (region path or back button):
+    // after a keyboard action, focus is moved to its counterpart so Escape keeps working.
+    const restoreFocus = useRef(false);
+    const open = (code: string | null, viaKeyboard = false) => {
         if (code === active) return;
+        restoreFocus.current = viaKeyboard;
         if (!isControlled) setInnerRegion(code);
         onRegionChange?.(code ? areaOf(regionDef(code), regionEntries.find((e) => e.code === code)?.entry) : null);
     };
@@ -203,13 +207,25 @@ function ItalyDrilldownMapInner<TMeta>(
     }), []);
 
     const firstRun = useRef(true);
+    const prevActive = useRef(active);
+    const backRef = useRef<HTMLButtonElement>(null);
     useEffect(() => {
         const map = innerRef.current;
         const first = firstRun.current;
+        const prev = prevActive.current;
         firstRun.current = false;
+        prevActive.current = active;
         if (!map) return;
         if (active) map.zoomTo(PROVINCES_OF(active).map((p) => p.code), { padding: 0.12, animate: !first });
         else if (!first) map.resetZoom();
+
+        if (!restoreFocus.current) return;
+        restoreFocus.current = false;
+        const svg = map.getSvgElement();
+        const target: HTMLElement | SVGElement | null | undefined = active
+            ? backRef.current ?? svg?.querySelector<SVGElement>(`[data-code="${PROVINCES_OF(active)[0]?.code}"]`)
+            : prev ? svg?.querySelector<SVGElement>(`[data-code="${prev}"]`) : null;
+        target?.focus({ preventScroll: true });
     }, [active]);
 
     const lastHoverKind = useRef<'region' | 'province' | null>(null);
@@ -218,7 +234,7 @@ function ItalyDrilldownMapInner<TMeta>(
             onProvinceClick?.(area, e);
         } else if (area.kind === 'region') {
             onRegionClick?.(area, e);
-            open(area.code);
+            open(area.code, e.type === 'keydown');
         }
     };
     const handleHover: AreaHoverHandler<TMeta> = (area, e) => {
@@ -245,9 +261,11 @@ function ItalyDrilldownMapInner<TMeta>(
             decorations={decorations}
             overlay={active ? <path className="rim-borders" d={REGION_SHAPES[active]!.d} /> : null}
             htmlOverlay={active && showBackButton
-                ? <button type="button" className="rim-back" onClick={() => open(null)}>{backLabel}</button>
+                ? <button ref={backRef} type="button" className="rim-back" onClick={(e) => open(null, e.detail === 0)}>
+                    {backLabel}
+                </button>
                 : null}
-            onEscape={active ? () => open(null) : undefined}
+            onEscape={active ? () => open(null, true) : undefined}
             onBackgroundClick={active && closeOnBackgroundClick ? () => open(null) : undefined}
             selectionMode={provinceSelectionMode
                 ?? (selectedProvinces !== undefined || defaultSelectedProvinces !== undefined || onProvinceSelectionChange

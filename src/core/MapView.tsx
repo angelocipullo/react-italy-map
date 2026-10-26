@@ -159,7 +159,7 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
         let domain = colorScale.domain;
         if (!domain) {
             // Only the visible areas count, so a filtered map uses its full colour range.
-            const values = areas.map((a) => dataByCode.get(a.code)?.value).filter((v): v is number => typeof v === 'number');
+            const values = areas.map((a) => dataByCode.get(a.code)?.value).filter((v): v is number => Number.isFinite(v));
             domain = values.length ? [Math.min(...values), Math.max(...values)] : [0, 1];
         }
         const fn = createColorScale({ ...colorScale, domain });
@@ -322,6 +322,7 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
     const suppressClick = useRef(false);
     const handleClick = (e: ReactMouseEvent<SVGGElement>) => {
         if (suppressClick.current) { suppressClick.current = false; return; }
+        if (zoomable && e.detail > 1) return; // second click of a double-click zoom
         const code = codeOf(e.target);
         if (code) activate(code, e);
     };
@@ -384,6 +385,13 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
             onAreaHover?.(null, e);
         }
         if (!pointers.current.has(e.pointerId)) return;
+        // A mouse released outside the svg (no capture at zoom 1) never sent pointerup here.
+        if (e.pointerType === 'mouse' && e.buttons === 0) {
+            pointers.current.delete(e.pointerId);
+            drag.current = null;
+            setPanning(false);
+            return;
+        }
         pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
         if (pointers.current.size === 2) {
             const [a, b] = [...pointers.current.values()] as [{ x: number; y: number }, { x: number; y: number }];
@@ -480,6 +488,8 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
             clone.setAttribute('height', String(Math.round(vb.h)));
             clone.setAttribute('style', Object.entries(themeVars).map(([k, v]) => `${k}:${v}`).join(';'));
             clone.querySelectorAll('.rim-outline').forEach((n) => n.remove());
+            // The fade-in starts at opacity 0, which is what a rasteriser would capture.
+            clone.querySelectorAll('.rim-reveal').forEach((n) => n.classList.remove('rim-reveal'));
             const styleEl = document.createElementNS('http://www.w3.org/2000/svg', 'style');
             styleEl.textContent = CSS;
             clone.insertBefore(styleEl, clone.firstChild);
@@ -501,7 +511,7 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
         const isSelected = selectedSet.has(def.code);
         const disabled = !!d?.disabled;
         let fill = d?.color;
-        if (fill == null && scale && typeof d?.value === 'number') fill = scale(d.value, makeArea(def.code));
+        if (fill == null && scale && Number.isFinite(d?.value)) fill = scale(d!.value!, makeArea(def.code));
         const cls = ['rim-area'];
         if (def.kind === 'foreign') cls.push('rim-foreign');
         if (isSelected) cls.push('rim-selected');

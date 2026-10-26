@@ -2,7 +2,7 @@
 
 Lightweight, accessible, interactive SVG map of Italy for React — **20 regions and 110 provinces**, choropleths, single/multi selection, zoom & pinch, tooltips and keyboard navigation. Zero dependencies, ~20 KB gzip.
 
-**[Live demo](https://angelocipullo.github.io/react-italy-map/)** · [Examples](examples/)
+**[Live demo](https://angelocipullo.github.io/react-italy-map/)** · [Examples](examples/) · [Guide for AI agents](llms.txt)
 
 ```bash
 npm install react-italy-map
@@ -148,9 +148,111 @@ ref.current?.getSvgElement();
 const svg = ref.current?.toSVGString(); // standalone SVG, e.g. for a download
 ```
 
+## Preparing your data
+
+The map does not fetch, parse or aggregate data: you hand it one entry per area. Most real data needs a small `map()` first.
+
+### From an API or a CSV
+
+```ts
+// e.g. [{ regione: 'LOMBARDIA', ticket_attivi: '1.234' }, …]
+const toNumber = (s: string) => Number(s.replace(/\./g, '').replace(',', '.')); // Italian "1.234,5"
+
+const data = rows.map((row) => ({
+  id: row.regione,                     // any accepted id, see below
+  value: toNumber(row.ticket_attivi),  // must be a number
+  meta: row,                           // the original record, handed back in callbacks
+}));
+```
+
+`data` can also be an object keyed by id: `{ Lombardia: { value: 1234 }, Lazio: { value: 980 } }`.
+
+### Aggregating raw rows
+
+Got one row per item (a ticket, a store, an event) rather than totals? Count them per area; `findProvince` gives you the region of a province:
+
+```ts
+import { findProvince } from 'react-italy-map';
+
+const totals: Record<string, number> = {};
+for (const ticket of tickets) {
+  const region = findProvince(ticket.provincia)?.regionCode; // 'MI' → 'IT-25'
+  if (region) totals[region] = (totals[region] ?? 0) + 1;
+}
+const data = Object.entries(totals).map(([id, value]) => ({ id, value }));
+```
+
+### Accepted ids
+
+Ids are matched case-, accent- and punctuation-insensitively (`'EMILIA ROMAGNA'`, `"Valle d’Aosta"` and `'valle-daosta'` all work).
+
+| | Regions | Provinces |
+|---|---|---|
+| Code | ISO 3166-2 `IT-25` | sigla `MI`, `IT-MI` |
+| ISTAT | `03`, `3` | `015`, `15` |
+| Name | `Lombardia`, `Lombardy`, `Trentino-Alto Adige/Südtirol` | `Milano`, `Reggio nell'Emilia`, `Bolzano/Bozen` |
+| Aliases | | `Reggio Emilia`, `Monza e Brianza`, `Forli-Cesena`, `Massa Carrara`, `Pesaro-Urbino`, `Bozen`… |
+| Neighbours | `SM`, `VA`, `FR-H` (San Marino, Vatican City, Corsica) | |
+
+**Not recognised** — normalise these yourself:
+
+- **Prefixes**: `Regione Lombardia`, `Provincia di Milano`, `Città metropolitana di Roma Capitale` → strip them.
+- **English city names**: `Milan`, `Rome`, `Turin`… → use the Italian name or the sigla.
+- **Autonomous provinces as regions**: many health and civil-protection datasets split Trentino-Alto Adige into `P.A. Trento` / `P.A. Bolzano` (codes `21` / `22`). The region map has one Trentino-Alto Adige: sum the two into `IT-32`, or use the province map, where they are `TN` and `BZ`.
+- **Sud Sardegna** (`SU`, ISTAT `111`, 2016–2025) no longer exists after the 2025 Sardinian reform and has no shape. The older `Carbonia-Iglesias` and `Olbia-Tempio` resolve to their closest successors (`Sulcis Iglesiente`, `Gallura Nord-Est Sardegna`).
+
+Check your ids before rendering:
+
+```ts
+const unmatched = rows.filter((row) => !findRegion(row.regione)); // or findProvince
+```
+
+In development, `ItalyMap` and `ItalyProvincesMap` also log `no area matches data id "…"`; `ItalyDrilldownMap` drops unmatched ids silently.
+
+### What happens to…
+
+| Input | Result |
+|---|---|
+| An id that matches nothing | Ignored (dev warning, see above). |
+| A `value` that is not a finite number (`'42'`, `null`, `NaN`) | Not coloured, not counted in the automatic domain. Convert strings with `Number()`. |
+| An area with no entry | Drawn with `theme.fill`. Pick a `fill` that cannot be mistaken for the lowest colour of your scale if "no data" and "zero" must look different. |
+| Two entries for the same area | The last one wins. |
+| `color` and `value` on the same entry | `color` wins over `colorScale`. |
+
+### Ids in callbacks
+
+Callbacks and `onSelectionChange` always use the **canonical code** (`'IT-25'`, `'MI'`), whatever id you passed. To get back to your record, read `area.data.meta`, or look it up by code:
+
+```tsx
+<ItalyMap
+  data={data}
+  onRegionClick={(area) => openDetails(area.data?.meta)}
+  onSelectionChange={(codes) => setFilter(codes.map((code) => findRegion(code)!.name))}
+/>
+```
+
+### Live or changing data
+
+Without `domain`, the colour scale spans the min–max of the current values, so a colour's meaning shifts every time the data changes. For live data (refreshing counts, a time slider, several maps side by side) set a fixed `domain`, and share the same constants with `<Legend>`:
+
+```tsx
+const SCALE = { colors: ['#e0f2fe', '#0c4a6e'], domain: [0, 500] as [number, number], steps: 5 };
+
+<Legend {...SCALE} title="Ticket attivi" />
+<ItalyMap data={data} colorScale={SCALE} />
+```
+
+For other kinds of scales (quantiles, thresholds, categories, diverging around zero) pass a function; it receives the value and the area:
+
+```ts
+colorScale={(value) => (value === 0 ? '#dcfce7' : value < 50 ? '#fde68a' : '#ef4444')}
+```
+
+Or skip `colorScale` and set `color` on each entry.
+
 ## API
 
-`ItalyMap`, `ItalyProvincesMap` and `ItalyDrilldownMap` share these props (the drill-down map has no selection props).
+`ItalyMap`, `ItalyProvincesMap` and `ItalyDrilldownMap` share these props. The drill-down map replaces the selection props with its own province ones (`selectedProvinces`, … — see above) and has no `include` / `exclude` / `zoomOnSelect`.
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -227,7 +329,7 @@ getRegionsOfArea('isole');      // Sicilia, Sardegna
 createColorScale({ colors: ['#fff', '#000'], domain: [0, 100] })(50); // '#808080'
 ```
 
-Accepted ids: regions by ISO code (`IT-25`), ISTAT code (`03`, `3`), Italian or English name, slug, bilingual official name; provinces by sigla (`MI`), ISTAT code (`015`), `IT-MI`, name and common aliases (`Reggio Emilia`, `Monza e Brianza`, `Bolzano/Bozen`…). Neighbours: `SM`, `VA`, `FR-H`.
+Both lookups accept the same ids as `data` (see [Accepted ids](#accepted-ids)) and return `undefined` when nothing matches — handy to validate your data before rendering it.
 
 ## Bundle size
 
@@ -245,6 +347,10 @@ Run `npm run size` to measure again.
 ## Next.js / SSR
 
 The map renders on the server (tooltips mount on the client). The components already carry `"use client"`, so they work straight from Server Components.
+
+## Using it with AI coding agents
+
+[`llms.txt`](llms.txt) is a compact guide for coding agents (Claude Code, Cursor, Copilot…): which component to pick, how to shape data, accepted and rejected ids, every prop. It ships in the npm package (`node_modules/react-italy-map/llms.txt`) and is online at <https://angelocipullo.github.io/react-italy-map/llms.txt> — point your agent to it.
 
 ## Examples
 
