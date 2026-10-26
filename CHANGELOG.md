@@ -4,6 +4,9 @@
 
 - New `ItalyDrilldownMap` (`react-italy-map/provinces`): click a region to zoom in and open it into its provinces, with the other regions kept as faded context; back button and Escape to return; `region` / `defaultRegion` / `onRegionChange`, `provinceData`, `provinceColorScale`.
 - `zoomTo` ignores far-off islets (Lampedusa, Pantelleria, Tremiti…) so the view frames the main body of an area.
+
+## 1.0.2
+
 - Fix: a selected area keeps `selectedFill` while hovered (the hover colour used to win).
 
 ## 1.0.1
