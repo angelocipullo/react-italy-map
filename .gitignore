@@ -1,0 +1,6 @@
+/node_modules
+/dist
+/demo-dist
+/scripts/.cache
+.DS_Store
+.claude/

@@ -1,0 +1,106 @@
+{
+  "name": "react-italy-map",
+  "version": "2.0.0",
+  "description": "Lightweight, accessible, interactive SVG map of Italy for React — regions and provinces, choropleths, selection, zoom and tooltips.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./provinces": {
+      "import": {
+        "types": "./dist/provinces.d.ts",
+        "default": "./dist/provinces.js"
+      },
+      "require": {
+        "types": "./dist/provinces.d.ts",
+        "default": "./dist/provinces.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "provinces": [
+        "./dist/provinces.d.ts"
+      ]
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "build:demo": "vite build --mode demo",
+    "preview": "vite preview --outDir demo-dist",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc",
+    "geo": "node scripts/build-geo.mjs",
+    "size": "node scripts/size.mjs",
+    "prepublishOnly": "npm run test && npm run build"
+  },
+  "keywords": [
+    "react",
+    "italy",
+    "italia",
+    "map",
+    "mappa",
+    "svg",
+    "regions",
+    "regioni",
+    "provinces",
+    "province",
+    "choropleth",
+    "istat",
+    "interactive",
+    "geo"
+  ],
+  "author": "Angelo Cipullo (https://github.com/angelocipullo)",
+  "homepage": "https://github.com/angelocipullo/react-italy-map#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angelocipullo/react-italy-map.git"
+  },
+  "bugs": {
+    "url": "https://github.com/angelocipullo/react-italy-map/issues"
+  },
+  "license": "ISC",
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "^25.2.3",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.4",
+    "d3-geo": "^3.1.1",
+    "jsdom": "^29.1.1",
+    "polylabel": "^2.1.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "topojson-client": "^3.1.0",
+    "topojson-simplify": "^3.0.3",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^5.0.5"
+  }
+}
