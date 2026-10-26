@@ -77,7 +77,7 @@
   "bugs": {
     "url": "https://github.com/angelocipullo/react-italy-map/issues"
   },
-  "license": "ISC",
+  "license": "MIT",
   "peerDependencies": {
     "react": ">=17.0.0",
     "react-dom": ">=17.0.0"

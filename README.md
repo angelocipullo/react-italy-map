@@ -242,4 +242,4 @@ Administrative boundaries © [ISTAT](https://www.istat.it/), licensed [CC-BY 4.0
 
 ## License
 
-ISC
+[MIT](LICENSE) © Angelo Cipullo. Boundary data: ISTAT, CC-BY 4.0 (see above).

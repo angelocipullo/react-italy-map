@@ -1015,7 +1015,7 @@ export default function App() {
       </main>
 
       <footer style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)', borderTop: '1px solid var(--surface-border)' }}>
-        <p>© 2026 React Italy Map. Licenza ISC · Confini amministrativi: ISTAT (CC-BY 4.0) via openpolis/geojson-italy.</p>
+        <p>© 2026 React Italy Map. Licenza MIT · Confini amministrativi: ISTAT (CC-BY 4.0) via openpolis/geojson-italy.</p>
       </footer>
     </div>
   );
