@@ -9,7 +9,7 @@ import {
     type Ref,
     type SyntheticEvent,
 } from 'react';
-import type { AreaData, AreaDataInput, BaseMapProps, ColorScaleInput, ItalyMapHandle, MapArea } from './types';
+import type { AreaData, AreaDataInput, BaseMapProps, ColorScaleInput, ItalyMapHandle, MapArea, SelectionMode } from './types';
 import { REGION_SHAPES } from './data/regions.geo';
 import { buildIndex, CORSICA, SAN_MARINO, VATICAN, type AreaDef } from './core/areas';
 import { REGION_AREAS } from './core/regionAreas';
@@ -19,6 +19,8 @@ import { MapView, type AreaEventHandler, type AreaHoverHandler } from './core/Ma
 import { findProvince, findRegion } from './lookup';
 
 const INDEX = buildIndex([...REGION_AREAS, ...PROVINCE_AREAS]);
+const PROVINCE_CODES = new Set(PROVINCE_AREAS.map((p) => p.code));
+const isProvince = (code: string) => PROVINCE_CODES.has(code);
 const PROVINCES_OF = (regionCode: string) => PROVINCE_AREAS.filter((p) => p.regionCode === regionCode);
 
 type Omitted = 'selected' | 'defaultSelected' | 'selectionMode' | 'onSelectionChange' | 'dimUnselected'
@@ -42,6 +44,18 @@ export interface ItalyDrilldownMapProps<TMeta = unknown> extends Omit<BaseMapPro
     dimOthers?: boolean;
     /** @default true */
     showBackButton?: boolean;
+    /** Clicking the map background (not another region) closes the open region. @default true */
+    closeOnBackgroundClick?: boolean;
+    /** Selected province(s), controlled (any province id). Kept while regions open and close. */
+    selectedProvinces?: string | readonly string[] | null;
+    /** Initially selected province(s), uncontrolled. */
+    defaultSelectedProvinces?: string | readonly string[] | null;
+    /**
+     * `'single'` or `'multiple'` province selection.
+     * @default 'single' when any province selection prop is set, 'none' otherwise
+     */
+    provinceSelectionMode?: SelectionMode;
+    onProvinceSelectionChange?: (codes: string[], province: MapArea<TMeta>) => void;
     /** @default '← Italia' */
     backLabel?: string;
     onRegionClick?: (region: MapArea<TMeta>, event: SyntheticEvent) => void;
@@ -98,6 +112,11 @@ function ItalyDrilldownMapInner<TMeta>(
         provinceColorScale,
         dimOthers = true,
         showBackButton = true,
+        closeOnBackgroundClick = true,
+        selectedProvinces,
+        defaultSelectedProvinces,
+        provinceSelectionMode,
+        onProvinceSelectionChange,
         backLabel = '← Italia',
         onRegionClick,
         onRegionHover,
@@ -229,6 +248,14 @@ function ItalyDrilldownMapInner<TMeta>(
                 ? <button type="button" className="rim-back" onClick={() => open(null)}>{backLabel}</button>
                 : null}
             onEscape={active ? () => open(null) : undefined}
+            onBackgroundClick={active && closeOnBackgroundClick ? () => open(null) : undefined}
+            selectionMode={provinceSelectionMode
+                ?? (selectedProvinces !== undefined || defaultSelectedProvinces !== undefined || onProvinceSelectionChange
+                    ? 'single' : 'none')}
+            selected={selectedProvinces}
+            defaultSelected={defaultSelectedProvinces}
+            onSelectionChange={onProvinceSelectionChange}
+            isSelectable={isProvince}
             defaultTitle="Mappa delle regioni e delle province d'Italia"
             defaultLabel={(a) => (a.kind === 'province' ? a.code : active ? null : a.name)}
             onAreaClick={handleClick}

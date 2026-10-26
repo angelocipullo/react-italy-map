@@ -276,4 +276,43 @@ describe('<ItalyDrilldownMap>', () => {
         rerender(<ItalyDrilldownMap region="IT-75" />);
         expect(area(container, 'BA')).not.toBeNull();
     });
+
+    it('closes when the background is clicked, not when another region is', () => {
+        const { container } = render(<ItalyDrilldownMap defaultRegion="Puglia" zoomable />);
+        const svg = container.querySelector('svg')!;
+        fireEvent.click(area(container, 'BA'));
+        expect(area(container, 'BA')).not.toBeNull(); // province click keeps it open
+        fireEvent.click(svg);
+        expect(area(container, 'BA')).toBeNull();
+        fireEvent.click(area(container, 'IT-75'));
+        expect(area(container, 'BA')).not.toBeNull();
+        fireEvent.click(area(container, 'IT-25')); // another region: switch, not close
+        expect(area(container, 'MI')).not.toBeNull();
+        const { container: c2 } = render(<ItalyDrilldownMap defaultRegion="Puglia" closeOnBackgroundClick={false} />);
+        fireEvent.click(c2.querySelector('svg')!);
+        expect(area(c2, 'BA')).not.toBeNull();
+    });
+
+    it('selects provinces without affecting region clicks', () => {
+        const onSel = vi.fn();
+        const { container } = render(<ItalyDrilldownMap defaultRegion="Puglia" provinceSelectionMode="multiple" onProvinceSelectionChange={onSel} />);
+        fireEvent.click(area(container, 'BA'));
+        fireEvent.click(area(container, 'LE'));
+        expect(onSel).toHaveBeenLastCalledWith(['BA', 'LE'], expect.objectContaining({ code: 'LE', selected: true }));
+        expect(area(container, 'BA').classList.contains('rim-selected')).toBe(true);
+        expect(area(container, 'BA').getAttribute('aria-pressed')).toBe('true');
+        expect(area(container, 'IT-25').hasAttribute('aria-pressed')).toBe(false);
+        fireEvent.click(area(container, 'IT-62')); // opens Lazio, selection untouched
+        expect(onSel).toHaveBeenCalledTimes(2);
+        expect(area(container, 'RM')).not.toBeNull();
+    });
+
+    it('dims only while the selected province is visible', () => {
+        const { container, getByText } = render(<ItalyDrilldownMap defaultRegion="Puglia" defaultSelectedProvinces="BA" />);
+        expect(area(container, 'LE').classList.contains('rim-dim')).toBe(true);
+        fireEvent.click(getByText('← Italia'));
+        expect(container.querySelectorAll('.rim-dim')).toHaveLength(0);
+        fireEvent.click(area(container, 'IT-75'));
+        expect(area(container, 'BA').classList.contains('rim-selected')).toBe(true);
+    });
 });

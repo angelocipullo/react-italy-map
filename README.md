@@ -85,7 +85,7 @@ function Drilldown() {
 
 ### Click to open a region into its provinces
 
-`ItalyDrilldownMap` starts with the regions; clicking one zooms in and reveals its provinces in place, with the rest of Italy kept as faded context. A back button and the Escape key return to the whole country.
+`ItalyDrilldownMap` starts with the regions; clicking one zooms in and reveals its provinces in place, with the rest of Italy kept as faded context. The back button, the Escape key or a click on the background return to the whole country; clicking another region moves there.
 
 ```tsx
 import { ItalyDrilldownMap } from 'react-italy-map/provinces';
@@ -108,9 +108,13 @@ import { ItalyDrilldownMap } from 'react-italy-map/provinces';
 | `provinceColorScale` | like `colorScale` | `colorScale` | Without `domain`, spans the provinces of the open region. |
 | `dimOthers` | `boolean` | `true` | Fade the other regions while one is open. |
 | `showBackButton` / `backLabel` | `boolean` / `string` | `true` / `'← Italia'` | |
+| `closeOnBackgroundClick` | `boolean` | `true` | Clicking the background (not another region) goes back to Italy. |
+| `selectedProvinces` / `defaultSelectedProvinces` | `string \| string[] \| null` | — | Province selection, controlled / uncontrolled. Kept while regions open and close. |
+| `provinceSelectionMode` | `'none' \| 'single' \| 'multiple'` | auto | `'single'` when a province selection prop is set. |
+| `onProvinceSelectionChange` | `(codes, province) => void` | — | |
 | `onRegionClick` / `onProvinceClick`, `onRegionHover` / `onProvinceHover` | | — | |
 
-It accepts the other map props (`theme`, `showLabels`, `zoomable`, `renderTooltip`, `ref`…) except the selection ones.
+It accepts the other map props (`theme`, `showLabels`, `zoomable`, `renderTooltip`, `ref`…); selection applies to provinces only.
 
 ### Custom tooltip, labels and content
 

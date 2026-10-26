@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0
+
+- `ItalyDrilldownMap`: clicking the map background (not another region) goes back to Italy (`closeOnBackgroundClick`, default `true`); a drag never counts as a click.
+- `ItalyDrilldownMap`: province selection — `selectedProvinces`, `defaultSelectedProvinces`, `provinceSelectionMode`, `onProvinceSelectionChange`. Region clicks keep opening regions.
+- Areas are only dimmed while a selected area is on screen.
+
 ## 1.1.0
 
 - New `ItalyDrilldownMap` (`react-italy-map/provinces`): click a region to zoom in and open it into its provinces, with the other regions kept as faded context; back button and Escape to return; `region` / `defaultRegion` / `onRegionChange`, `provinceData`, `provinceColorScale`.

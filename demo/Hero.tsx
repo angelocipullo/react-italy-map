@@ -15,7 +15,7 @@ const PRESETS: { id: PresetId; label: string; hint: string }[] = [
   { id: 'choropleth', label: 'Coropletica', hint: 'Popolazione per regione con colorScale e Legend.' },
   { id: 'multi', label: 'Multi-selezione', hint: 'selectionMode="multiple": scegli più regioni, anche da tastiera.' },
   { id: 'provinces', label: '110 Province', hint: 'Tutte le province ISTAT, con zoom. Cerca e vola a una provincia.' },
-  { id: 'drilldown', label: 'Drill-down', hint: 'ItalyDrilldownMap: clicca una regione e si apre nelle sue province. Esc per tornare.' },
+  { id: 'drilldown', label: 'Drill-down', hint: 'Clicca una regione per aprirla nelle sue province, poi seleziona una provincia. Clic sullo sfondo o Esc per tornare.' },
 ];
 
 // Map colours tuned for the dark hero.
@@ -141,16 +141,19 @@ export function Provinces() {
   );
 }`;
     case 'drilldown':
-      return `import { ItalyDrilldownMap } from 'react-italy-map/provinces';
+      return `import { useState } from 'react';
+import { ItalyDrilldownMap } from 'react-italy-map/provinces';
 
 export function Drilldown() {
+  const [province, setProvince] = useState<string | null>(null);
   return (
     <ItalyDrilldownMap
       data={regionPopulation}          // [{ id: 'Lombardia', value: … }]
       provinceData={provincePopulation} // [{ id: 'MI', value: … }]
       colorScale={{ colors: ['#3b4f86', '#3b82f6', '#a5f3fc'] }}
       onRegionChange={(r) => console.log(r?.name)}
-      onProvinceClick={(p) => console.log(p.code)}${common}
+      selectedProvinces={province}
+      onProvinceSelectionChange={(codes) => setProvince(codes[0] ?? null)}${common}
     />
   );
 }`;
@@ -298,7 +301,8 @@ export default function Hero() {
           showCorsica={false}
           region={drillRegion}
           onRegionChange={r => { setDrillRegion(r?.code ?? null); setHovered(null); push(r ? `onRegionChange → ${r.name}` : 'onRegionChange → null'); }}
-          onProvinceClick={p => push(`onProvinceClick → ${p.name} (${p.code})`)}
+          selectedProvinces={province}
+          onProvinceSelectionChange={(codes, p) => { setProvince(codes); push(`onProvinceSelectionChange → [${codes.join(', ')}] · ${p.name}`); }}
           backLabel="← Italia"
         />
       );

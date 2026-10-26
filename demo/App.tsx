@@ -53,6 +53,7 @@ const PROPS_TABLE = [
   { prop: 'include / exclude', type: 'string[]', default: '—', desc: 'Mostra solo / nascondi alcune aree. Con include la vista si adatta.' },
   { prop: 'showCorsica / showSanMarino / showVatican', type: 'boolean', default: 'true', desc: 'Territori non italiani.' },
   { prop: 'region', type: 'string | string[]', default: '—', desc: 'Solo ItalyProvincesMap: mostra le province delle regioni indicate.' },
+  { prop: 'provinceData / selectedProvinces', type: 'AreaData[] / string[]', default: '—', desc: 'Solo ItalyDrilldownMap: dati e selezione delle province; region / onRegionChange per la regione aperta; closeOnBackgroundClick per tornare all\'Italia cliccando lo sfondo.' },
   { prop: 'showRegionBorders', type: 'boolean', default: 'true (Italia intera)', desc: 'Solo ItalyProvincesMap: confini regionali in evidenza.' },
 ];
 
@@ -156,7 +157,7 @@ const ApiReference = () => {
   return (
     <section id="api" className="section">
       <h2 className="section-title">API Reference</h2>
-      <p className="section-subtitle">Props comuni a <code>ItalyMap</code> e <code>ItalyProvincesMap</code>, tema, dati e utilities.</p>
+      <p className="section-subtitle">Props comuni a <code>ItalyMap</code>, <code>ItalyProvincesMap</code> e <code>ItalyDrilldownMap</code>, tema, dati e utilities.</p>
 
       <div className="api-tabs">
         {(Object.keys(labels) as ApiTab[]).map(t => (

@@ -49,6 +49,10 @@ export interface MapViewProps<TMeta> extends BaseMapProps<TMeta> {
     htmlOverlay?: ReactNode;
     /** Called when Escape is pressed inside the map. */
     onEscape?: () => void;
+    /** Click on the map background (not on an area, not after a drag). */
+    onBackgroundClick?: (event: SyntheticEvent) => void;
+    /** Limits selection to some areas; clicks on the others only fire onAreaClick. */
+    isSelectable?: (code: string) => boolean;
     /** Fit the view to `areas` instead of the whole of Italy. */
     fit?: boolean;
     defaultTitle: string;
@@ -117,7 +121,7 @@ const codeOf = (target: EventTarget | null): string | null => {
 
 function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle>) {
     const {
-        areas, index, decorations, overlay, htmlOverlay, onEscape, fit, defaultTitle, defaultLabel,
+        areas, index, decorations, overlay, htmlOverlay, onEscape, onBackgroundClick, isSelectable, fit, defaultTitle, defaultLabel,
         data, colorScale, formatValue,
         theme = {}, className, style: styleProp, width, height, title,
         selected, defaultSelected, selectionMode, onSelectionChange, dimUnselected,
@@ -182,7 +186,8 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
     const controlledCodes = useMemo(() => toCodes(controlledValue), [controlledKey, toCodes]); // eslint-disable-line react-hooks/exhaustive-deps
     const selectedCodes = isControlled ? controlledCodes : innerSelected;
     const selectedSet = useMemo(() => new Set(selectedCodes), [selectedCodes]);
-    const dim = (dimUnselected ?? mode === 'single') && selectedSet.size > 0;
+    // Only dim while a selected area is actually on screen.
+    const dim = (dimUnselected ?? mode === 'single') && selectedCodes.some((c) => byCode.has(c));
 
     const interactive = mode !== 'none' || !!onAreaClick;
 
@@ -301,7 +306,7 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
     const activate = (code: string, e: SyntheticEvent) => {
         const d = dataByCode.get(code);
         if (d?.disabled) return;
-        if (mode !== 'none') {
+        if (mode !== 'none' && (isSelectable?.(code) ?? true)) {
             const was = selectedSet.has(code);
             const next = mode === 'single'
                 ? (was ? [] : [code])
@@ -421,6 +426,12 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
         }
     };
 
+    const onSvgClick = (e: ReactMouseEvent<SVGSVGElement>) => {
+        if (codeOf(e.target)) return; // handled by the area
+        if (suppressClick.current) { suppressClick.current = false; return; }
+        onBackgroundClick?.(e);
+    };
+
     const onDoubleClick = (e: ReactMouseEvent<SVGSVGElement>) => {
         if (!zoomable) return;
         const p = toView(e.clientX, e.clientY);
@@ -508,7 +519,7 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
                 hover={d?.hoverColor}
                 focusable={interactive && !disabled}
                 role={interactive ? 'button' : undefined}
-                pressed={mode !== 'none' ? isSelected : undefined}
+                pressed={mode !== 'none' && (isSelectable?.(def.code) ?? true) ? isSelected : undefined}
                 disabled={disabled}
                 ariaLabel={typeof d?.value === 'number' ? `${def.name}: ${valueText(def.code, d.value)}` : def.name}
             />,
@@ -592,6 +603,7 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
                 onPointerUp={onPointerEnd}
                 onPointerCancel={onPointerEnd}
                 onDoubleClick={onDoubleClick}
+                onClick={onSvgClick}
             >
                 <g transform={`scale(${1 / GRID})`}>
                     {decorations?.map((def) => <path key={def.code} className="rim-deco" d={def.shape.d} />)}

@@ -39,16 +39,24 @@
 
 /* ── Top bar ───────────────────────────────────────────── */
 .topbar {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 10;
+  z-index: 100;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 32px;
+  height: 64px;
+  padding: 0 32px;
+  background: rgba(11, 16, 32, 0.82);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
 }
+
+/* Anchored sections land below the fixed header. */
+section[id] { scroll-margin-top: 80px; }
 .topbar-logo {
   display: flex;
   align-items: center;
@@ -441,7 +449,7 @@
   .hero2-grid { grid-template-columns: 1fr; height: auto; }
   .hero2-panel { order: 2; padding: 24px 16px 32px; border-right: 0; border-top: 1px solid var(--line); overflow: visible; }
   .hero2-map { order: 1; height: 78vh; padding: 72px 12px 60px; }
-  .topbar { padding: 14px 16px; }
+  .topbar { height: 56px; padding: 0 16px; }
   .topbar-links a:not(.topbar-gh) { display: none; }
   .hero-legend, .hero-back { left: 12px; top: 68px; }
   .hero2-status { left: 12px; }
