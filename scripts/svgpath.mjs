@@ -1,4 +1,4 @@
-// Minimal parser for the relative "m … z" paths used in the legacy region data.
+// Minimal parser for the relative "m … z" paths used in scripts/corsica.txt.
 export function parseRelativePath(d) {
   const rings = [];
   const tokens = d.match(/[mzMZlL]|[+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?/g) ?? [];

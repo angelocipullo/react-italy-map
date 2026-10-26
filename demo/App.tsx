@@ -527,7 +527,7 @@ const PROPS_TABLE = [
   { prop: 'formatValue', type: '(value, area) => string', default: 'toLocaleString', desc: 'Formatta value nel tooltip di default e negli aria-label.' },
   { prop: 'theme', type: 'MapTheme', default: '{}', desc: 'Colori, bordi, etichette, focus. Vedi tab "theme".' },
   { prop: 'width / height', type: 'number | string', default: "'100%' / auto", desc: 'Responsive di default: la mappa riempie la larghezza e mantiene le proporzioni. Con solo height, la larghezza si adatta.' },
-  { prop: 'className / style', type: 'string / CSSProperties', default: '—', desc: 'Applicati al contenitore. Le chiavi v1 di style (baseColor, …) sono ancora supportate.' },
+  { prop: 'className / style', type: 'string / CSSProperties', default: '—', desc: 'Applicati al contenitore.' },
   { prop: 'selected', type: 'string | string[] | null', default: '—', desc: 'Selezione controllata (qualsiasi id).' },
   { prop: 'defaultSelected', type: 'string | string[]', default: '—', desc: 'Selezione iniziale non controllata.' },
   { prop: 'selectionMode', type: "'none' | 'single' | 'multiple'", default: 'auto', desc: "'single' se passi una prop di selezione, altrimenti 'none'." },

@@ -210,20 +210,6 @@ Run `npm run size` to measure again.
 
 The map renders on the server (tooltips mount on the client). The components already carry `"use client"`, so they work straight from Server Components.
 
-## Migrating from v1
-
-| v1 | v2 |
-|---|---|
-| `InteractiveItalyMap` | `ItalyMap` (the old name is still exported) |
-| `style={{ baseColor, borderColor, selectedRegionColor, hoverColor, height }}` | `theme={{ fill, stroke, selectedFill, hoverFill }}` and `height` — v1 keys are still read |
-| fixed pixel size | responsive by default; pass `height` for the v1 behaviour |
-| `selectedRegion="IT-25"` | `selected="IT-25"` (still accepted) |
-| `onRegionClick(code, name)` (empty code on deselect) | `onRegionClick(area, event)` → `area.code`, `area.name`, `area.selected` |
-| `onRegionHover(code, name)` | `onRegionHover(area \| null, event)` |
-| `children={({ region, code }) => …}` | `renderTooltip={(area) => …}` → `area.name`, `area.code` |
-| `RegionData`, `MapStyle`, `Province` | `AreaData`, `MapTheme`, `ProvinceInfo` (old names kept as aliases) |
-| 107 provinces with `Sud Sardegna` | 110 provinces (ISTAT 2025: `OT`, `OG`, `VS`, `CI`; `SU` removed) |
-
 ## Development
 
 ```bash
@@ -238,7 +224,7 @@ npm run size       # bundle size report
 
 ## Data attribution
 
-Administrative boundaries © [ISTAT](https://www.istat.it/), licensed [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/), via [openpolis/geojson-italy](https://github.com/openpolis/geojson-italy). Corsica outline from the original v1 artwork.
+Administrative boundaries © [ISTAT](https://www.istat.it/), licensed [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/), via [openpolis/geojson-italy](https://github.com/openpolis/geojson-italy). Corsica outline drawn in the same frame.
 
 ## License
 

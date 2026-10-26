@@ -1,5 +1,5 @@
-export { ItalyMap, ItalyMap as InteractiveItalyMap } from './ItalyMap';
-export type { ItalyMapProps, InteractiveItalyMapProps } from './ItalyMap';
+export { ItalyMap } from './ItalyMap';
+export type { ItalyMapProps } from './ItalyMap';
 export { Legend } from './Legend';
 export type { LegendProps } from './Legend';
 
@@ -19,11 +19,8 @@ export type {
     ItalyMapHandle,
     MacroArea,
     MapArea,
-    MapStyle,
     MapTheme,
-    Province,
     ProvinceInfo,
-    RegionData,
     RegionInfo,
     SelectionMode,
     ZoomToOptions,

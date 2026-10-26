@@ -108,12 +108,12 @@ describe('<ItalyMap>', () => {
         expect(container.querySelectorAll('.rim-dim')).toHaveLength(0);
     });
 
-    it('respects controlled selection, including the v1 prop', () => {
+    it('respects controlled selection', () => {
         const { container, rerender } = render(<ItalyMap selected={['lazio', 'Sicilia']} />);
         expect(container.querySelectorAll('.rim-selected')).toHaveLength(2);
         rerender(<ItalyMap selected={null} />);
         expect(container.querySelectorAll('.rim-selected')).toHaveLength(0);
-        rerender(<ItalyMap selectedRegion="IT-25" />);
+        rerender(<ItalyMap selected="IT-25" />);
         expect(area(container, 'IT-25').classList.contains('rim-selected')).toBe(true);
     });
 
@@ -179,8 +179,8 @@ describe('<ItalyMap>', () => {
         expect(area(c2, 'IT-88')).toBeNull();
     });
 
-    it('maps the v1 style prop onto the theme', () => {
-        const { container } = render(<ItalyMap style={{ baseColor: '#111111', height: 400 }} />);
+    it('applies theme and sizing', () => {
+        const { container } = render(<ItalyMap theme={{ fill: '#111111' }} height={400} />);
         const root = container.firstElementChild as HTMLElement;
         expect(root.style.getPropertyValue('--rim-fill')).toBe('#111111');
         expect(root.style.height).toBe('400px');

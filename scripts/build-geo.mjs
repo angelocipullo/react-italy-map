@@ -5,9 +5,8 @@
  *
  * Every shape (regions, provinces, San Marino, Vatican) is derived from one
  * province topology, so borders between levels match exactly. The projection is
- * the ellipsoidal Mercator fitted to the frame of the original v1 SVG, so the
- * map looks the same as before. Corsica (not in ISTAT data) is re-encoded from
- * the v1 SVG.
+ * an ellipsoidal Mercator scaled to a 610 × 793 frame. Corsica (not in ISTAT
+ * data) comes from scripts/corsica.txt, a path in the same frame.
  *
  *   node scripts/build-geo.mjs [--tolerance 0.3] [--grid 4]
  */
@@ -28,12 +27,12 @@ const arg = (name, def) => {
   const i = process.argv.indexOf(`--${name}`);
   return i > -1 ? Number(process.argv[i + 1]) : def;
 };
-/** Minimum triangle area (in v1 viewBox units²) kept by Visvalingam simplification. */
+/** Minimum triangle area (in viewBox units²) kept by Visvalingam simplification. */
 const TOLERANCE = arg('tolerance', 0.3);
-/** Output grid: coordinates are stored as integers in units of 1/GRID of the v1 viewBox. */
+/** Output grid: coordinates are stored as integers in units of 1/GRID of the viewBox. */
 const GRID = arg('grid', 4);
 
-// v1 frame and fitted projection: x = AX·lon + BX, y = AY·mercY(lat) + BY
+// Frame and projection: x = AX·lon + BX, y = AY·mercY(lat) + BY
 const FRAME = { w: 610.30981, h: 792.58575 };
 const AX = 51.2692095, BX = -339.35995;
 const AY = 51.2590859 * (180 / Math.PI), BY = 2729.10769;
@@ -96,7 +95,7 @@ if (!fs.existsSync(cacheFile)) {
 }
 const source = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));
 
-// Decode quantized arcs and project them into the v1 frame.
+// Decode quantized arcs and project them into the frame.
 const { scale: [sx, sy], translate: [tx, ty] } = source.transform;
 const projected = {
   type: 'Topology',
@@ -233,8 +232,8 @@ for (const [code, ring] of Object.entries(enclaves)) {
   foreignShapes[code] = shape({ type: 'Polygon', coordinates: coords });
 }
 {
-  const legacy = fs.readFileSync(path.join(ROOT, 'scripts', 'corsica.v1.txt'), 'utf8').trim();
-  const rings = parseRelativePath(legacy).map((r) => [r]);
+  const corsica = fs.readFileSync(path.join(ROOT, 'scripts', 'corsica.txt'), 'utf8').trim();
+  const rings = parseRelativePath(corsica).map((r) => [r]);
   foreignShapes['FR-H'] = shape({ type: 'MultiPolygon', coordinates: rings });
 }
 

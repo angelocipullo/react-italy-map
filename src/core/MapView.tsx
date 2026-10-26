@@ -122,10 +122,9 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
         onAreaClick, onAreaHover,
     } = props;
 
-    // ── v1 `style` compatibility ──────────────────────────────────
-    const { baseColor, borderColor, selectedRegionColor, hoverColor, ...cssStyle } = styleProp ?? {};
-    const fillColor = theme.fill ?? baseColor ?? '#e2e8f0';
-    const selectedFill = theme.selectedFill ?? selectedRegionColor ?? '#3b82f6';
+    const cssStyle = styleProp ?? {};
+    const fillColor = theme.fill ?? '#e2e8f0';
+    const selectedFill = theme.selectedFill ?? '#3b82f6';
 
     // ── Lookup ────────────────────────────────────────────────────
     const byCode = useMemo(() => new Map(areas.map((a) => [a.code, a])), [areas]);
@@ -159,8 +158,7 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
     }, [colorScale, dataByCode, areas]);
 
     // ── Selection ─────────────────────────────────────────────────
-    const legacySelected = (props as { selectedRegion?: string | null }).selectedRegion;
-    const controlledValue = selected !== undefined ? selected : legacySelected;
+    const controlledValue = selected;
     const isControlled = controlledValue !== undefined;
     const mode: SelectionMode = selectionMode
         ?? (isControlled || defaultSelected !== undefined || onSelectionChange ? 'single' : 'none');
@@ -436,9 +434,9 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
     // ── Imperative API ────────────────────────────────────────────
     const themeVars = {
         '--rim-fill': fillColor,
-        '--rim-stroke': theme.stroke ?? borderColor ?? '#ffffff',
+        '--rim-stroke': theme.stroke ?? '#ffffff',
         '--rim-sw': `${theme.strokeWidth ?? 1}px`,
-        '--rim-hover': theme.hoverFill ?? hoverColor ?? selectedFill,
+        '--rim-hover': theme.hoverFill ?? selectedFill,
         '--rim-selected': selectedFill,
         '--rim-disabled': theme.disabledFill ?? '#f1f5f9',
         '--rim-foreign': theme.foreignFill ?? fillColor,

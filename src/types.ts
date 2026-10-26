@@ -31,9 +31,6 @@ export interface ProvinceInfo {
     aliases?: string[];
 }
 
-/** @deprecated Use `ProvinceInfo`. */
-export type Province = ProvinceInfo;
-
 /** Geometry of one area. `d` is on the GRID scale, `label` and `bbox` in viewBox units. */
 export interface AreaShape {
     d: string;
@@ -67,9 +64,6 @@ export interface AreaData<TMeta = unknown> {
     /** Any extra data, handed back in callbacks and tooltips. */
     meta?: TMeta;
 }
-
-/** @deprecated Use `AreaData`. */
-export type RegionData<TMeta = unknown> = AreaData<TMeta>;
 
 /** `data` can be an array of entries or an object keyed by id. */
 export type AreaDataInput<TMeta = unknown> =
@@ -119,17 +113,6 @@ export interface MapTheme {
     regionBorder?: string;
 }
 
-/** v1 `style` prop keys, still accepted. */
-export interface LegacyMapStyle {
-    baseColor?: string;
-    borderColor?: string;
-    selectedRegionColor?: string;
-    hoverColor?: string;
-    height?: number;
-}
-/** @deprecated Use `theme`. */
-export type MapStyle = LegacyMapStyle;
-
 export interface ColorScaleOptions {
     /** Two or more hex colours, from the lowest to the highest value. */
     colors: readonly string[];
@@ -173,8 +156,8 @@ export interface BaseMapProps<TMeta = unknown> {
 
     theme?: MapTheme;
     className?: string;
-    /** CSS for the container. The v1 keys (`baseColor`, …) are still read as theme. */
-    style?: CSSProperties & LegacyMapStyle;
+    /** CSS for the container. */
+    style?: CSSProperties;
     /** CSS width. @default '100%' (or auto from `height`) */
     width?: number | string;
     /** CSS height. @default auto, from the map aspect ratio */

@@ -21,12 +21,7 @@ const INDEX = buildIndex(ALL_AREAS);
 export interface ItalyMapProps<TMeta = unknown> extends BaseMapProps<TMeta> {
     onRegionClick?: (region: MapArea<TMeta>, event: SyntheticEvent) => void;
     onRegionHover?: (region: MapArea<TMeta> | null, event: SyntheticEvent | null) => void;
-    /** @deprecated Use `selected`. */
-    selectedRegion?: string | null;
 }
-
-/** @deprecated Use `ItalyMapProps`. */
-export type InteractiveItalyMapProps<TMeta = unknown> = ItalyMapProps<TMeta>;
 
 function ItalyMapInner<TMeta>(
     {
