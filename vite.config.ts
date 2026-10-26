@@ -3,6 +3,11 @@ import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 import { resolve } from 'node:path';
 
+const PACKAGE_ALIAS = [
+    { find: /^react-italy-map\/provinces$/, replacement: resolve('src/provinces.ts') },
+    { find: /^react-italy-map$/, replacement: resolve('src/index.ts') },
+];
+
 // `vite` / `vite build --mode demo` → showcase site (demo/)
 // `vite build`                      → the npm library (dist/)
 export default defineConfig(({ command, mode }) => {
@@ -10,6 +15,8 @@ export default defineConfig(({ command, mode }) => {
         return {
             plugins: [react()],
             base: './',
+            // Demo and examples import the package by name, straight from the sources.
+            resolve: { alias: PACKAGE_ALIAS },
             build: { outDir: 'demo-dist' },
         };
     }

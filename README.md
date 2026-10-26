@@ -2,6 +2,8 @@
 
 Lightweight, accessible, interactive SVG map of Italy for React — **20 regions and 110 provinces**, choropleths, single/multi selection, zoom & pinch, tooltips and keyboard navigation. Zero dependencies, ~20 KB gzip.
 
+**[Live demo](https://angelocipullo.github.io/react-italy-map/)** · [Examples](examples/)
+
 ```bash
 npm install react-italy-map
 ```
@@ -210,10 +212,24 @@ Run `npm run size` to measure again.
 
 The map renders on the server (tooltips mount on the client). The components already carry `"use client"`, so they work straight from Server Components.
 
+## Examples
+
+Complete, copy-pasteable components in [`examples/`](examples/) — the same ones running in the [live demo](https://angelocipullo.github.io/react-italy-map/):
+
+| Example | Shows |
+|---|---|
+| [Choropleth](examples/Choropleth.tsx) | `value` + `colorScale`, `Legend`, hover callback |
+| [Filter](examples/Filter.tsx) | single selection as a filter, disabled regions, custom tooltip |
+| [MultiSelect](examples/MultiSelect.tsx) | `selectionMode="multiple"` |
+| [Drilldown](examples/Drilldown.tsx) | regions → provinces of the clicked region |
+| [Provinces](examples/Provinces.tsx) | all provinces, zoom, `ref.zoomTo`, SVG export |
+
+They use the demo stylesheet for layout; the map code works anywhere.
+
 ## Development
 
 ```bash
-npm run dev        # showcase site (demo/)
+npm run dev        # showcase site (demo/ + examples/)
 npm test           # vitest
 npm run build      # library → dist/
 npm run geo        # regenerate src/data from ISTAT boundaries

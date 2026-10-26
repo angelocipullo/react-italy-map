@@ -946,3 +946,22 @@ input:checked + .slider:before {
   font: inherit;
   margin-bottom: 8px;
 }
+
+.ex-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.ex-source-link {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--primary, #3b82f6);
+  text-decoration: none;
+}
+.ex-source-link:hover { text-decoration: underline; }

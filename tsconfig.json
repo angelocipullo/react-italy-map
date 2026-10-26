@@ -15,7 +15,11 @@
     "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "moduleDetection": "force",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "react-italy-map": ["./src/index.ts"],
+      "react-italy-map/provinces": ["./src/provinces.ts"]
+    }
   },
-  "include": ["src", "demo", "test"]
+  "include": ["src", "demo", "examples", "test"]
 }
