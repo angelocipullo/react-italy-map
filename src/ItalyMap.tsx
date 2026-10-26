@@ -1,19 +1,8 @@
 import { forwardRef, useMemo, type ReactElement, type Ref, type SyntheticEvent } from 'react';
 import type { BaseMapProps, ItalyMapHandle, MapArea } from './types';
-import { REGIONS } from './data/regions.meta';
-import { REGION_SHAPES } from './data/regions.geo';
-import { buildIndex, CORSICA, normalizeId, SAN_MARINO, VATICAN, type AreaDef } from './core/areas';
-import { regionKeys } from './core/keys';
+import { buildIndex, CORSICA, normalizeId, SAN_MARINO, VATICAN } from './core/areas';
+import { REGION_AREAS } from './core/regionAreas';
 import { MapView, type AreaEventHandler, type AreaHoverHandler } from './core/MapView';
-
-const REGION_AREAS: AreaDef[] = REGIONS.map((r) => ({
-    code: r.code,
-    name: r.name,
-    kind: 'region',
-    istat: r.istat,
-    shape: REGION_SHAPES[r.code]!,
-    keys: regionKeys(r),
-}));
 
 const ALL_AREAS = [...REGION_AREAS, SAN_MARINO, VATICAN, CORSICA];
 const INDEX = buildIndex(ALL_AREAS);

@@ -36,6 +36,8 @@ export interface AreaShape {
     d: string;
     label: number[];
     bbox: number[];
+    /** Bounding box without far-off islets, used when zooming to the area. */
+    focus?: number[];
 }
 
 export type AreaKind = 'region' | 'province' | 'foreign';

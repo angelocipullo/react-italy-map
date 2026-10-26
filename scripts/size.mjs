@@ -6,6 +6,7 @@ import { build } from 'vite';
 const cases = {
     'ItalyMap': "import { ItalyMap } from './dist/index.js'; console.log(ItalyMap);",
     'ItalyProvincesMap': "import { ItalyProvincesMap } from './dist/provinces.js'; console.log(ItalyProvincesMap);",
+    'ItalyDrilldownMap': "import { ItalyDrilldownMap } from './dist/provinces.js'; console.log(ItalyDrilldownMap);",
     'both + Legend': "import { ItalyMap, Legend } from './dist/index.js'; import { ItalyProvincesMap } from './dist/provinces.js'; console.log(ItalyMap, Legend, ItalyProvincesMap);",
     'findRegion only': "import { findRegion } from './dist/index.js'; console.log(findRegion);",
 };

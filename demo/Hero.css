@@ -447,3 +447,12 @@
   .hero2-status { left: 12px; }
   .hero2-scroll { display: none; }
 }
+
+.hero2-map .rim-back {
+  left: 0;
+  top: 8px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #fff;
+  border-color: var(--line-2);
+  backdrop-filter: blur(8px);
+}

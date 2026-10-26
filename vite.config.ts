@@ -43,7 +43,7 @@ export default defineConfig(({ command, mode }) => {
                     // One file per module, so bundlers can drop what isn't imported.
                     preserveModules: true,
                     preserveModulesRoot: 'src',
-                    banner: (chunk) => (/(MapView|ItalyMap|ItalyProvincesMap|Legend)$/.test(chunk.name) ? '"use client";' : ''),
+                    banner: (chunk) => (/(MapView|ItalyMap|ItalyProvincesMap|ItalyDrilldownMap|Legend)$/.test(chunk.name) ? '"use client";' : ''),
                 },
             },
         },

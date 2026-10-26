@@ -83,6 +83,35 @@ function Drilldown() {
 
 `region` accepts one or more regions and fits the view to them. On the full province map, region borders are drawn thicker (`showRegionBorders`).
 
+### Click to open a region into its provinces
+
+`ItalyDrilldownMap` starts with the regions; clicking one zooms in and reveals its provinces in place, with the rest of Italy kept as faded context. A back button and the Escape key return to the whole country.
+
+```tsx
+import { ItalyDrilldownMap } from 'react-italy-map/provinces';
+
+<ItalyDrilldownMap
+  data={regionPopulation}            // [{ id: 'Lombardia', value: 10_060_574 }, …]
+  provinceData={provincePopulation}  // [{ id: 'MI', value: 3_250_315 }, …]
+  colorScale={{ colors: ['#e0f2fe', '#0369a1'] }}
+  showLabels
+  onRegionChange={(region) => console.log(region?.name ?? 'Italia')}
+  onProvinceClick={(province) => console.log(province.code)}
+/>
+```
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `region` / `defaultRegion` | `string \| null` | — | Open region, controlled / uncontrolled (any region id). |
+| `onRegionChange` | `(region \| null) => void` | — | A region was opened or closed. |
+| `provinceData` | `AreaData[] \| Record<id, …>` | — | Province data; `data` is for regions. |
+| `provinceColorScale` | like `colorScale` | `colorScale` | Without `domain`, spans the provinces of the open region. |
+| `dimOthers` | `boolean` | `true` | Fade the other regions while one is open. |
+| `showBackButton` / `backLabel` | `boolean` / `string` | `true` / `'← Italia'` | |
+| `onRegionClick` / `onProvinceClick`, `onRegionHover` / `onProvinceHover` | | — | |
+
+It accepts the other map props (`theme`, `showLabels`, `zoomable`, `renderTooltip`, `ref`…) except the selection ones.
+
 ### Custom tooltip, labels and content
 
 ```tsx
@@ -117,7 +146,7 @@ const svg = ref.current?.toSVGString(); // standalone SVG, e.g. for a download
 
 ## API
 
-`ItalyMap` and `ItalyProvincesMap` share the same props.
+`ItalyMap`, `ItalyProvincesMap` and `ItalyDrilldownMap` share these props (the drill-down map has no selection props).
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
@@ -202,8 +231,9 @@ Measured after minification, as your bundler would ship it:
 
 | Import | min | gzip |
 |---|---|---|
-| `ItalyMap` | 54 KB | 20 KB |
-| `ItalyProvincesMap` | 109 KB | 36 KB |
+| `ItalyMap` | 55 KB | 20.5 KB |
+| `ItalyProvincesMap` | 110 KB | 36 KB |
+| `ItalyDrilldownMap` | 133 KB | 47 KB |
 | `findRegion` only | 17 KB | 3.7 KB |
 
 Run `npm run size` to measure again.
@@ -221,7 +251,7 @@ Complete, copy-pasteable components in [`examples/`](examples/) — the same one
 | [Choropleth](examples/Choropleth.tsx) | `value` + `colorScale`, `Legend`, hover callback |
 | [Filter](examples/Filter.tsx) | single selection as a filter, disabled regions, custom tooltip |
 | [MultiSelect](examples/MultiSelect.tsx) | `selectionMode="multiple"` |
-| [Drilldown](examples/Drilldown.tsx) | regions → provinces of the clicked region |
+| [Drilldown](examples/Drilldown.tsx) | `ItalyDrilldownMap`: click a region to open its provinces |
 | [Provinces](examples/Provinces.tsx) | all provinces, zoom, `ref.zoomTo`, SVG export |
 
 They use the demo stylesheet for layout; the map code works anywhere.

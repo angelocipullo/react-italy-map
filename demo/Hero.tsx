@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ItalyMap, Legend, PROVINCES, REGIONS, findProvince, findRegion, type ItalyMapHandle, type MapArea, type MapTheme } from 'react-italy-map';
-import { ItalyProvincesMap } from 'react-italy-map/provinces';
+import { ItalyMap, Legend, PROVINCES, REGIONS, findProvince, type ItalyMapHandle, type MapArea, type MapTheme } from 'react-italy-map';
+import { ItalyDrilldownMap, ItalyProvincesMap } from 'react-italy-map/provinces';
 import { POPULATION, PROVINCE_POP } from '../examples/data/population';
 import { version as VERSION } from '../package.json';
 import './Hero.css';
@@ -15,7 +15,7 @@ const PRESETS: { id: PresetId; label: string; hint: string }[] = [
   { id: 'choropleth', label: 'Coropletica', hint: 'Popolazione per regione con colorScale e Legend.' },
   { id: 'multi', label: 'Multi-selezione', hint: 'selectionMode="multiple": scegli più regioni, anche da tastiera.' },
   { id: 'provinces', label: '110 Province', hint: 'Tutte le province ISTAT, con zoom. Cerca e vola a una provincia.' },
-  { id: 'drilldown', label: 'Drill-down', hint: 'Clicca una regione per entrare nelle sue province.' },
+  { id: 'drilldown', label: 'Drill-down', hint: 'ItalyDrilldownMap: clicca una regione e si apre nelle sue province. Esc per tornare.' },
 ];
 
 // Map colours tuned for the dark hero.
@@ -125,7 +125,7 @@ export function Zones() {
     case 'provinces':
       return `import { useRef } from 'react';
 import type { ItalyMapHandle } from 'react-italy-map';
-import { ItalyProvincesMap } from 'react-italy-map/provinces';
+import { ItalyDrilldownMap, ItalyProvincesMap } from 'react-italy-map/provinces';
 
 export function Provinces() {
   const ref = useRef<ItalyMapHandle>(null);
@@ -141,20 +141,17 @@ export function Provinces() {
   );
 }`;
     case 'drilldown':
-      return `import { useState } from 'react';
-import { ItalyMap } from 'react-italy-map';
-import { ItalyProvincesMap } from 'react-italy-map/provinces';
+      return `import { ItalyDrilldownMap } from 'react-italy-map/provinces';
 
 export function Drilldown() {
-  const [region, setRegion] = useState<string | null>(null);
-  return region ? (
-    <ItalyProvincesMap
-      region={region}
-      data={provincePopulation}
-      colorScale={{ colors: ['#3b4f86', '#3b82f6', '#a5f3fc'] }}${common}
+  return (
+    <ItalyDrilldownMap
+      data={regionPopulation}          // [{ id: 'Lombardia', value: … }]
+      provinceData={provincePopulation} // [{ id: 'MI', value: … }]
+      colorScale={{ colors: ['#3b4f86', '#3b82f6', '#a5f3fc'] }}
+      onRegionChange={(r) => console.log(r?.name)}
+      onProvinceClick={(p) => console.log(p.code)}${common}
     />
-  ) : (
-    <ItalyMap onRegionClick={(r) => setRegion(r.code)}${common} />
   );
 }`;
   }
@@ -290,31 +287,20 @@ export default function Hero() {
       );
       break;
     case 'drilldown':
-      map = drillRegion ? (
-        <ItalyProvincesMap
-          key={drillRegion}
+      map = (
+        <ItalyDrilldownMap
           {...common}
-          region={drillRegion}
-          theme={{ ...DARK, hoverFill: '#f59e0b' }}
-          data={PROVINCE_DATA}
+          theme={{ ...DARK, hoverFill: '#f59e0b', labelSize: 14 }}
+          data={POP_DATA}
+          provinceData={PROVINCE_DATA}
           colorScale={{ colors: HEAT }}
           formatValue={fmtPop}
-        />
-      ) : (
-        <ItalyMap
-          {...common}
-          theme={{ ...DARK, hoverFill: '#f59e0b' }}
-          data={POP_DATA}
-          colorScale={{ colors: HEAT, domain: POP_DOMAIN }}
-          formatValue={fmtPop}
           showCorsica={false}
-          onRegionClick={a => { if (a.kind === 'region') { setDrillRegion(a.code); setHovered(null); push(`<ItalyProvincesMap region="${a.code}" />`); } }}
+          region={drillRegion}
+          onRegionChange={r => { setDrillRegion(r?.code ?? null); setHovered(null); push(r ? `onRegionChange → ${r.name}` : 'onRegionChange → null'); }}
+          onProvinceClick={p => push(`onProvinceClick → ${p.name} (${p.code})`)}
+          backLabel="← Italia"
         />
-      );
-      overlay = drillRegion && (
-        <button className="hero-back" onClick={() => { setDrillRegion(null); push('← Italia'); }}>
-          ← Italia <span>/ {findRegion(drillRegion)?.name}</span>
-        </button>
       );
       break;
   }

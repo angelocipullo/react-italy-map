@@ -1,21 +1,10 @@
 import { forwardRef, useMemo, type ReactElement, type Ref, type SyntheticEvent } from 'react';
 import type { BaseMapProps, ItalyMapHandle, MapArea } from './types';
-import { PROVINCES } from './data/provinces.meta';
-import { PROVINCE_SHAPES, REGION_BORDERS } from './data/provinces.geo';
-import { buildIndex, CORSICA, normalizeId, SAN_MARINO, VATICAN, type AreaDef } from './core/areas';
-import { provinceKeys } from './core/keys';
+import { REGION_BORDERS } from './data/provinces.geo';
+import { buildIndex, CORSICA, normalizeId, SAN_MARINO, VATICAN } from './core/areas';
+import { PROVINCE_AREAS } from './core/provinceAreas';
 import { MapView, type AreaEventHandler, type AreaHoverHandler } from './core/MapView';
 import { findRegion } from './lookup';
-
-const PROVINCE_AREAS: AreaDef[] = PROVINCES.map((p) => ({
-    code: p.code,
-    name: p.name,
-    kind: 'province',
-    istat: p.istat,
-    regionCode: p.regionCode,
-    shape: PROVINCE_SHAPES[p.code]!,
-    keys: provinceKeys(p),
-}));
 const INDEX = buildIndex(PROVINCE_AREAS);
 
 export interface ItalyProvincesMapProps<TMeta = unknown> extends BaseMapProps<TMeta> {

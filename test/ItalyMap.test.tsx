@@ -5,7 +5,7 @@ import {
     createColorScale, findProvince, findRegion, getProvincesOfRegion, ItalyMap,
     PROVINCES, PROVINCES_BY_REGION, REGIONS, type ItalyMapHandle,
 } from '../src';
-import { ItalyProvincesMap } from '../src/provinces';
+import { ItalyDrilldownMap, ItalyProvincesMap } from '../src/provinces';
 
 afterEach(cleanup);
 
@@ -216,5 +216,64 @@ describe('<ItalyProvincesMap>', () => {
         fireEvent.click(area(container, 'MI'));
         expect(onClick.mock.calls[0]![0]).toMatchObject({ code: 'MI', name: 'Milano', regionCode: 'IT-25', kind: 'province' });
         expect([...container.querySelectorAll('.rim-label')].map((l) => l.textContent)).toContain('MI');
+    });
+});
+
+describe('<ItalyDrilldownMap>', () => {
+    it('opens a region into its provinces and goes back', () => {
+        const onChange = vi.fn();
+        const { container, getByText } = render(<ItalyDrilldownMap onRegionChange={onChange} />);
+        expect(container.querySelectorAll('.rim-area')).toHaveLength(20);
+        fireEvent.click(area(container, 'IT-75'));
+        expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ code: 'IT-75', name: 'Puglia' }));
+        // Puglia is replaced by its 6 provinces; the other 19 regions stay, dimmed.
+        expect(area(container, 'IT-75')).toBeNull();
+        expect(container.querySelectorAll('[data-code="BA"], [data-code="LE"]')).toHaveLength(2);
+        expect(container.querySelectorAll('.rim-area')).toHaveLength(19 + 6);
+        expect(area(container, 'IT-25').classList.contains('rim-dim')).toBe(true);
+        fireEvent.click(getByText('← Italia'));
+        expect(onChange).toHaveBeenLastCalledWith(null);
+        expect(container.querySelectorAll('.rim-area')).toHaveLength(20);
+    });
+
+    it('closes on Escape and moves between regions', () => {
+        const { container } = render(<ItalyDrilldownMap defaultRegion="Lazio" />);
+        expect(area(container, 'RM')).not.toBeNull();
+        fireEvent.click(area(container, 'IT-52'));
+        expect(area(container, 'FI')).not.toBeNull();
+        expect(area(container, 'RM')).toBeNull();
+        fireEvent.keyDown(area(container, 'FI'), { key: 'Escape' });
+        expect(area(container, 'FI')).toBeNull();
+    });
+
+    it('routes clicks by kind and colours regions and provinces separately', () => {
+        const onRegion = vi.fn();
+        const onProvince = vi.fn();
+        const { container } = render(
+            <ItalyDrilldownMap
+                region="Umbria"
+                data={[{ id: 'Lazio', value: 100 }, { id: 'Umbria', value: 0 }]}
+                provinceData={[{ id: 'Perugia', value: 10 }, { id: 'Terni', value: 5 }, { id: 'Milano', value: 999 }]}
+                colorScale={{ colors: ['#000000', '#ffffff'] }}
+                onRegionClick={onRegion}
+                onProvinceClick={onProvince}
+            />,
+        );
+        expect(area(container, 'IT-62').style.getPropertyValue('--a-fill')).toBe('#ffffff');
+        // Province domain spans only Umbria: Terni is the minimum even though Milano has 999.
+        expect(area(container, 'PG').style.getPropertyValue('--a-fill')).toBe('#ffffff');
+        expect(area(container, 'TR').style.getPropertyValue('--a-fill')).toBe('#000000');
+        expect(area(container, 'MI')).toBeNull();
+        fireEvent.click(area(container, 'PG'));
+        expect(onProvince.mock.calls[0]![0]).toMatchObject({ code: 'PG', kind: 'province', regionCode: 'IT-55' });
+        expect(onRegion).not.toHaveBeenCalled();
+    });
+
+    it('is controlled by the region prop', () => {
+        const { container, rerender } = render(<ItalyDrilldownMap region={null} />);
+        fireEvent.click(area(container, 'IT-75'));
+        expect(area(container, 'BA')).toBeNull(); // parent did not update the prop
+        rerender(<ItalyDrilldownMap region="IT-75" />);
+        expect(area(container, 'BA')).not.toBeNull();
     });
 });

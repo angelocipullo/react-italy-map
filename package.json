@@ -1,6 +1,6 @@
 {
   "name": "react-italy-map",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Lightweight, accessible, interactive SVG map of Italy for React — regions and provinces, choropleths, selection, zoom and tooltips.",
   "type": "module",
   "main": "./dist/index.cjs",

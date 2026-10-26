@@ -45,6 +45,10 @@ export interface MapViewProps<TMeta> extends BaseMapProps<TMeta> {
     decorations?: readonly AreaDef[];
     /** SVG drawn above the areas, in GRID units. */
     overlay?: ReactNode;
+    /** HTML drawn over the map (e.g. a back button). */
+    htmlOverlay?: ReactNode;
+    /** Called when Escape is pressed inside the map. */
+    onEscape?: () => void;
     /** Fit the view to `areas` instead of the whole of Italy. */
     fit?: boolean;
     defaultTitle: string;
@@ -59,10 +63,11 @@ const EMPTY: readonly string[] = [];
 const toList = (v: string | readonly string[] | null | undefined): readonly string[] =>
     v == null ? EMPTY : typeof v === 'string' ? [v] : v;
 
-const unionBox = (defs: readonly AreaDef[]): Box | null => {
+const unionBox = (defs: readonly AreaDef[], focus = false): Box | null => {
     if (!defs.length) return null;
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-    for (const { shape: { bbox } } of defs) {
+    for (const { shape } of defs) {
+        const bbox = (focus && shape.focus) || shape.bbox;
         x0 = Math.min(x0, bbox[0]!); y0 = Math.min(y0, bbox[1]!);
         x1 = Math.max(x1, bbox[2]!); y1 = Math.max(y1, bbox[3]!);
     }
@@ -112,7 +117,7 @@ const codeOf = (target: EventTarget | null): string | null => {
 
 function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle>) {
     const {
-        areas, index, decorations, overlay, fit, defaultTitle, defaultLabel,
+        areas, index, decorations, overlay, htmlOverlay, onEscape, fit, defaultTitle, defaultLabel,
         data, colorScale, formatValue,
         theme = {}, className, style: styleProp, width, height, title,
         selected, defaultSelected, selectionMode, onSelectionChange, dimUnselected,
@@ -209,7 +214,7 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
 
     const zoomTo = useCallback((ids: string | readonly string[], options: { padding?: number; animate?: boolean } = {}) => {
         const defs = toCodes(ids).map((c) => byCode.get(c)).filter((d): d is AreaDef => !!d);
-        const b = unionBox(defs);
+        const b = unionBox(defs, true);
         if (b) animateTo(pad(b, options.padding ?? 0.15), options.animate ?? true);
     }, [animateTo, byCode, toCodes]);
 
@@ -423,6 +428,7 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
     };
 
     const onContainerKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+        if (e.key === 'Escape' && onEscape) { e.preventDefault(); onEscape(); return; }
         if (!zoomable) return;
         if (e.key === '+' || e.key === '=') zoomAt(1 / 1.5, undefined, undefined, true);
         else if (e.key === '-' || e.key === '_') zoomAt(1.5, undefined, undefined, true);
@@ -605,6 +611,8 @@ function MapViewInner<TMeta>(props: MapViewProps<TMeta>, ref: Ref<ItalyMapHandle
                 </g>
                 {labelNodes}
             </svg>
+
+            {htmlOverlay}
 
             {controls && (
                 <div className="rim-controls">
