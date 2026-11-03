@@ -12,10 +12,10 @@ Lightweight, accessible, interactive SVG map of Italy for React — **20 regions
 
 🇮🇹 *Mappa interattiva dell'Italia per React: regioni e province ISTAT, mappe coropletiche, selezione, zoom. Leggera, accessibile, pronta per Next.js.*
 
-**[Live demo](https://angelocipullo.github.io/react-italy-map/)** · [Examples](examples/) · [Guide for AI agents](llms.txt)
+**[Live demo](https://react-italy-map.angelocipullo.it/)** · [Examples](examples/) · [Guide for AI agents](llms.txt)
 
 <p align="center">
-  <a href="https://angelocipullo.github.io/react-italy-map/">
+  <a href="https://react-italy-map.angelocipullo.it/">
     <img src="https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/demo.gif" alt="react-italy-map demo: drill-down from Italy to the provinces of Tuscany, then a population choropleth" width="600" />
   </a>
 </p>
@@ -48,11 +48,11 @@ import { ItalyMap } from 'react-italy-map';
 
 | Choropleth | 110 provinces |
 |---|---|
-| [![Choropleth map of Italy by population](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/choropleth.jpg)](https://angelocipullo.github.io/react-italy-map/) | [![All 110 Italian provinces with labels](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/provinces.jpg)](https://angelocipullo.github.io/react-italy-map/) |
+| [![Choropleth map of Italy by population](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/choropleth.jpg)](https://react-italy-map.angelocipullo.it/) | [![All 110 Italian provinces with labels](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/provinces.jpg)](https://react-italy-map.angelocipullo.it/) |
 | **Drill-down** | **Multi-selection** |
-| [![Drill-down into the provinces of Tuscany](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/drilldown.jpg)](https://angelocipullo.github.io/react-italy-map/) | [![Multiple regions selected](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/multi.jpg)](https://angelocipullo.github.io/react-italy-map/) |
+| [![Drill-down into the provinces of Tuscany](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/drilldown.jpg)](https://react-italy-map.angelocipullo.it/) | [![Multiple regions selected](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/multi.jpg)](https://react-italy-map.angelocipullo.it/) |
 
-All of these are live — and editable — in the **[demo](https://angelocipullo.github.io/react-italy-map/)**.
+All of these are live — and editable — in the **[demo](https://react-italy-map.angelocipullo.it/)**.
 
 ## Usage
 
@@ -376,11 +376,11 @@ The map renders on the server (tooltips mount on the client). The components alr
 
 ## Using it with AI coding agents
 
-[`llms.txt`](llms.txt) is a compact guide for coding agents (Claude Code, Cursor, Copilot…): which component to pick, how to shape data, accepted and rejected ids, every prop. It ships in the npm package (`node_modules/react-italy-map/llms.txt`) and is online at <https://angelocipullo.github.io/react-italy-map/llms.txt> — point your agent to it.
+[`llms.txt`](llms.txt) is a compact guide for coding agents (Claude Code, Cursor, Copilot…): which component to pick, how to shape data, accepted and rejected ids, every prop. It ships in the npm package (`node_modules/react-italy-map/llms.txt`) and is online at <https://react-italy-map.angelocipullo.it/llms.txt> — point your agent to it.
 
 ## Examples
 
-Complete, copy-pasteable components in [`examples/`](examples/) — the same ones running in the [live demo](https://angelocipullo.github.io/react-italy-map/):
+Complete, copy-pasteable components in [`examples/`](examples/) — the same ones running in the [live demo](https://react-italy-map.angelocipullo.it/):
 
 | Example | Shows |
 |---|---|
