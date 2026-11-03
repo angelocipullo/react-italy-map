@@ -1,6 +1,6 @@
 {
   "name": "react-italy-map",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Lightweight, accessible, interactive SVG map of Italy for React — regions and provinces, choropleths, selection, zoom and tooltips.",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -67,7 +67,16 @@
     "choropleth",
     "istat",
     "interactive",
-    "geo"
+    "geo",
+    "react-component",
+    "italy-map",
+    "mappa-italia",
+    "react-map",
+    "svg-map",
+    "geojson",
+    "nextjs",
+    "typescript",
+    "data-visualization"
   ],
   "author": "Angelo Cipullo (https://github.com/angelocipullo)",
   "homepage": "https://github.com/angelocipullo/react-italy-map#readme",

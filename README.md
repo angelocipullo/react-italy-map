@@ -1,8 +1,24 @@
 # React Italy Map
 
+[![npm version](https://img.shields.io/npm/v/react-italy-map?color=3b82f6&label=npm)](https://www.npmjs.com/package/react-italy-map)
+[![npm downloads](https://img.shields.io/npm/dw/react-italy-map?color=10b981&label=downloads)](https://npm-stat.com/charts.html?package=react-italy-map)
+[![total downloads](https://img.shields.io/npm/dt/react-italy-map?color=10b981&label=total)](https://npm-stat.com/charts.html?package=react-italy-map)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/react-italy-map?label=gzip)](https://bundlephobia.com/package/react-italy-map)
+[![types](https://img.shields.io/npm/types/react-italy-map)](https://www.npmjs.com/package/react-italy-map)
+[![CI](https://github.com/angelocipullo/react-italy-map/actions/workflows/ci.yml/badge.svg)](https://github.com/angelocipullo/react-italy-map/actions/workflows/ci.yml)
+[![license](https://img.shields.io/npm/l/react-italy-map)](LICENSE)
+
 Lightweight, accessible, interactive SVG map of Italy for React — **20 regions and 110 provinces**, choropleths, single/multi selection, zoom & pinch, tooltips and keyboard navigation. Zero dependencies, ~20 KB gzip.
 
+🇮🇹 *Mappa interattiva dell'Italia per React: regioni e province ISTAT, mappe coropletiche, selezione, zoom. Leggera, accessibile, pronta per Next.js.*
+
 **[Live demo](https://angelocipullo.github.io/react-italy-map/)** · [Examples](examples/) · [Guide for AI agents](llms.txt)
+
+<p align="center">
+  <a href="https://angelocipullo.github.io/react-italy-map/">
+    <img src="https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/demo.gif" alt="react-italy-map demo: drill-down from Italy to the provinces of Tuscany, then a population choropleth" width="600" />
+  </a>
+</p>
 
 ```bash
 npm install react-italy-map
@@ -27,6 +43,16 @@ import { ItalyMap } from 'react-italy-map';
 - 🎨 **Themable** — `theme` prop, CSS variables, stable class names and `data-code` attributes.
 - ⚙️ **SSR / Next.js ready** — renders on the server, ships `"use client"`, ESM + CJS, TypeScript types.
 - 💾 **Export** — `ref.toSVGString()` returns standalone SVG markup.
+
+## Gallery
+
+| Choropleth | 110 provinces |
+|---|---|
+| [![Choropleth map of Italy by population](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/choropleth.jpg)](https://angelocipullo.github.io/react-italy-map/) | [![All 110 Italian provinces with labels](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/provinces.jpg)](https://angelocipullo.github.io/react-italy-map/) |
+| **Drill-down** | **Multi-selection** |
+| [![Drill-down into the provinces of Tuscany](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/drilldown.jpg)](https://angelocipullo.github.io/react-italy-map/) | [![Multiple regions selected](https://raw.githubusercontent.com/angelocipullo/react-italy-map/main/.github/assets/multi.jpg)](https://angelocipullo.github.io/react-italy-map/) |
+
+All of these are live — and editable — in the **[demo](https://angelocipullo.github.io/react-italy-map/)**.
 
 ## Usage
 

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2
+
+- Docs: README badges (version, downloads, bundle size, CI), demo GIF and screenshot gallery; more npm keywords.
+- Demo: canonical URL, Open Graph / Twitter preview image and JSON-LD metadata.
+
 ## 1.2.1
 
 - Fix: a mouse drag released outside the map no longer leaves the map panning (and jumping back) on the next hover.
